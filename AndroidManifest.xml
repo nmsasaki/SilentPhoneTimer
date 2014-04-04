@@ -16,7 +16,7 @@
         <activity
             android:name="ca.nmsasaki.silentphonetimer.FullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_fullscreen"
+            android:label="@string/app_diplay_name"
             android:theme="@style/FullscreenTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +24,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="ca.nmsasaki.silentphonetimer.WidgetService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+        
+        <receiver
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_diplay_name" 
+            android:name="ca.nmsasaki.silentphonetimer.MyWidgetProvider" >
+            
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_provider_metadata" />
+        </receiver>
     </application>
 
 </manifest>

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">SilentPhoneTimer</string>
-    <string name="title_activity_fullscreen">Silent Phone Timer</string>
+    <string name="app_diplay_name">Silent Phone Timer</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 

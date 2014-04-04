@@ -21,7 +21,7 @@ import android.widget.Toast;
  */
 public class FullscreenActivity extends Activity {
 
-	private static final String TAG = FullscreenActivity.class.getSimpleName();
+	private static final String TAG = "SilentPhoneTimer";
 	
 	private Button mDummyButton = null;
 	/**
@@ -56,7 +56,7 @@ public class FullscreenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.i(TAG, "onCreate - enter");
+		Log.i(TAG, "FullscreenActivity::onCreate - enter");
 		
 		setContentView(R.layout.activity_fullscreen);
 
@@ -133,6 +133,7 @@ public class FullscreenActivity extends Activity {
 					
 					  public void onClick(View arg0) {
 		 
+						 Log.i(TAG, "FullscreenActivity::make toast");
 					     Toast.makeText(getApplicationContext(), 
 		                               "Button is clicked", Toast.LENGTH_LONG).show();
 		 
