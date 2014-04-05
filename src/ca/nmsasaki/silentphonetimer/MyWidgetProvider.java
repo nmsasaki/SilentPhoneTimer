@@ -1,7 +1,5 @@
 package ca.nmsasaki.silentphonetimer;
 
-import java.util.Random;
-
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -31,14 +29,14 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
 
-		Log.i(TAG, "MyWidgetProvider::onReceive - enter");
-		
-        AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        Toast.makeText(context, "Touched view", Toast.LENGTH_SHORT).show();
-        
-        super.onReceive(context, intent);
-		
-		Log.i(TAG, "MyWidgetProvider::onReceive - exit");
+		Log.i(TAG, "MyWidgetProvider::onReceive");
+
+		// AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+		// Toast.makeText(context, "Touched view", Toast.LENGTH_SHORT).show();
+
+		// super.onReceive(context, intent);
+		//
+		// Log.i(TAG, "MyWidgetProvider::onReceive - exit");
 	}
 
 	@Override
@@ -50,31 +48,27 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		// Get all ids
 		ComponentName thisWidget = new ComponentName(context,
 				MyWidgetProvider.class);
-		
+
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
 				R.layout.widget_layout);
-	
-		int number = (new Random().nextInt(100));
 
-		remoteViews.setTextViewText(R.id.widget_text,
-				String.valueOf(number));
+		//int number = (new Random().nextInt(100));
 
-		 Log.i(TAG, "FullscreenActivity::make toast");
+		//remoteViews.setTextViewText(R.id.widget_image, String.valueOf(number));
 
-//	     Toast.makeText(getApplicationContext(), 
-//                       "Button is clicked", Toast.LENGTH_LONG).show();
+		Log.i(TAG, "MyWidgetProvider::onUpdate - make toast");
+		Toast.makeText(context, "Touched view", Toast.LENGTH_SHORT).show();
 
-		 
 		// Register an onClickListener
 		Intent intent = new Intent(context, MyWidgetProvider.class);
 
 		intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
 
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-				0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		
-		remoteViews.setOnClickPendingIntent(R.id.widget_text, pendingIntent);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
+				intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		remoteViews.setOnClickPendingIntent(R.id.widget_image, pendingIntent);
 		appWidgetManager.updateAppWidget(thisWidget, remoteViews);
 
 		// // Update the widgets via the service
@@ -83,5 +77,5 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		Log.i(TAG, "MyWidgetProvider::onUpdate - exit");
 
 	}
-	
+
 }

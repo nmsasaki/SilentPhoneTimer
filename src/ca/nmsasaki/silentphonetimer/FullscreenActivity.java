@@ -140,7 +140,7 @@ public class FullscreenActivity extends Activity {
 					  }
 					}
 			);
-		
+		Log.i(TAG,"FullscreenActivity::onCreate - exit");
 	}
 
 	@Override

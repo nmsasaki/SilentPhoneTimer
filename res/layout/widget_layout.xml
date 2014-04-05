@@ -5,15 +5,15 @@
     android:layout_height="match_parent">
 <!--     android:padding="@dimen/widget_margin" > -->
 
-    <TextView
-        android:id="@+id/widget_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FFFFFF"
-        android:text="0"
-        >
+<!--     <TextView -->
+<!--         android:id="@+id/widget_text" -->
+<!--         android:layout_width="match_parent" -->
+<!--         android:layout_height="match_parent" -->
+<!--         android:background="#FFFFFF" -->
+<!--         android:text="0" -->
+<!--         > -->
         
-    </TextView>
+<!--     </TextView> -->
     
 <!--     <ImageButton -->
 <!--         android:id="@+id/widget_button" -->
@@ -23,6 +23,16 @@
 <!--         android:contentDescription="@string/app_diplay_name" -->
 <!--         android:src="@drawable/ic_launcher" > -->
 <!--     </ImageButton> -->
+
+<ImageView
+        android:id="@+id/widget_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/app_diplay_name"
+        android:src="@drawable/ic_launcher" >
+        
+</ImageView>
     
 <!--     android:contentDescription primarily for accessibility -->
 
