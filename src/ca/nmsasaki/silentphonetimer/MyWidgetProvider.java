@@ -43,29 +43,26 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		// Get all ids
 		ComponentName thisWidget = new ComponentName(context,
 				MyWidgetProvider.class);
-		int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
-		for (int widgetId : allWidgetIds) {
-			// create some random data
-			// create some random data
-			int number = (new Random().nextInt(100));
-			RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-					R.layout.widget_layout);
-			// Set the text
-			remoteViews.setTextViewText(R.id.widget_text,
-					String.valueOf(number));
+		
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+				R.layout.widget_layout);
+	
+		int number = (new Random().nextInt(100));
 
-			// Register an onClickListener
-			Intent intent = new Intent(context, MyWidgetProvider.class);
+		remoteViews.setTextViewText(R.id.widget_text,
+				String.valueOf(number));
 
-			intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-			intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+		// Register an onClickListener
+		Intent intent = new Intent(context, MyWidgetProvider.class);
 
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-					0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			
-			remoteViews.setOnClickPendingIntent(R.id.widget_text, pendingIntent);
-			appWidgetManager.updateAppWidget(widgetId, remoteViews);
-		}
+		intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+		intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+				0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		
+		remoteViews.setOnClickPendingIntent(R.id.widget_text, pendingIntent);
+		appWidgetManager.updateAppWidget(thisWidget, remoteViews);
 
 		// // Update the widgets via the service
 		// context.startService(intent);
