@@ -9,5 +9,7 @@
     <string name="notification_ticker">Notifications disabled for the next x minutes</string>
     <string name="notification_title">Silent Phone Timer</string>
     <string name="notification_content">Phone will be quiet for x minutes</string>
+    <string name="notification_cancel">Enable notifications now</string>
+    
     
 </resources>

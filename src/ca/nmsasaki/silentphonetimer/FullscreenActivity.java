@@ -6,7 +6,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +18,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.RemoteViews.RemoteView;
 //import android.widget.Toast;
+import android.widget.RemoteViews;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -27,7 +31,11 @@ import android.widget.Button;
 public class FullscreenActivity extends Activity {
 
 	private static final String TAG = "SilentPhoneTimer";
-	
+
+	private final RemoteViews mNotificationView = new RemoteViews(
+			"ca.nmsasaki.silentphonetimer",
+			R.layout.notification_layout);
+
 	// Notification ID to allow for future updates
 	private static final int MY_NOTIFICATION_ID = 1;
 	
@@ -70,7 +78,7 @@ public class FullscreenActivity extends Activity {
 
 		final View controlsView = findViewById(R.id.fullscreen_content_controls);
 		final View contentView = findViewById(R.id.fullscreen_content);
-
+		
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
 		mSystemUiHider = SystemUiHider.getInstance(this, contentView,
@@ -150,23 +158,30 @@ public class FullscreenActivity extends Activity {
 		
 		
 		Resources res = getResources();
-		final String noteTickerText = res.getString(R.string.notification_ticker);
-		final String noteTitle = res.getString(R.string.notification_title);
-		final String noteContentText = res.getString(R.string.notification_content);
+		final String notiTickerText = res.getString(R.string.notification_ticker);
+		final String notiTitle = res.getString(R.string.notification_title);
+		final String notiContentText = res.getString(R.string.notification_content);
+		final String notiCancel = res.getString(R.string.notification_cancel);
 		
 		mDummyButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 
+				// Pending intent to be fired when notification is clicked
+				Intent intent = new Intent(v.getContext(), FullscreenActivity.class);
+				PendingIntent cancelPendingIntent = PendingIntent.getActivity(v.getContext(), 01,
+						intent, Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+				
 				// Define the Notification's expanded message and Intent:
 				Notification.Builder notificationBuilder = new Notification.Builder(
 						getApplicationContext())
-						.setTicker(noteTickerText)
-						.setSmallIcon(android.R.drawable.stat_sys_warning)
-						.setAutoCancel(true)
-						.setContentTitle(noteTitle)
-						.setContentText(noteContentText);
+						.setTicker(notiTickerText)
+						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
+						.setContentTitle(notiTitle)
+						.setContentText(notiContentText)
+						.addAction(android.R.drawable.ic_lock_silent_mode_off, notiCancel, cancelPendingIntent);
 
 				// Pass the Notification to the NotificationManager:
 				NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
