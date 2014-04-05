@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 //import android.widget.RemoteViews;
 
@@ -30,8 +31,14 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
 
-		Log.i(TAG, "MyWidgetProvider::onReceive");
-
+		Log.i(TAG, "MyWidgetProvider::onReceive - enter");
+		
+        AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+        Toast.makeText(context, "Touched view", Toast.LENGTH_SHORT).show();
+        
+        super.onReceive(context, intent);
+		
+		Log.i(TAG, "MyWidgetProvider::onReceive - exit");
 	}
 
 	@Override
@@ -52,6 +59,12 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		remoteViews.setTextViewText(R.id.widget_text,
 				String.valueOf(number));
 
+		 Log.i(TAG, "FullscreenActivity::make toast");
+
+//	     Toast.makeText(getApplicationContext(), 
+//                       "Button is clicked", Toast.LENGTH_LONG).show();
+
+		 
 		// Register an onClickListener
 		Intent intent = new Intent(context, MyWidgetProvider.class);
 
@@ -70,4 +83,5 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		Log.i(TAG, "MyWidgetProvider::onUpdate - exit");
 
 	}
+	
 }
