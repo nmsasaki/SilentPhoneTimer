@@ -4,14 +4,19 @@ import ca.nmsasaki.silentphonetimer.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
+//import android.widget.Toast;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -22,6 +27,9 @@ import android.widget.Toast;
 public class FullscreenActivity extends Activity {
 
 	private static final String TAG = "SilentPhoneTimer";
+	
+	// Notification ID to allow for future updates
+	private static final int MY_NOTIFICATION_ID = 1;
 	
 	private Button mDummyButton = null;
 	/**
@@ -57,7 +65,7 @@ public class FullscreenActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		Log.i(TAG, "FullscreenActivity::onCreate - enter");
-		
+
 		setContentView(R.layout.activity_fullscreen);
 
 		final View controlsView = findViewById(R.id.fullscreen_content_controls);
@@ -123,24 +131,53 @@ public class FullscreenActivity extends Activity {
 		// Upon interacting with UI controls, delay any scheduled hide()
 		// operations to prevent the jarring behavior of controls going away
 		// while interacting with the UI.
+		// ------------------------------------------------------
+
 		mDummyButton = (Button) findViewById(R.id.dummy_button);
 
-		mDummyButton.setOnTouchListener(
-				mDelayHideTouchListener);
+		mDummyButton.setOnTouchListener(mDelayHideTouchListener);
+
+//		mDummyButton.setOnClickListener(new View.OnClickListener() {
+//
+//			public void onClick(View arg0) {
+//
+//				Log.i(TAG, "FullscreenActivity::make toast");
+//				Toast.makeText(getApplicationContext(), "Button is clicked",
+//						Toast.LENGTH_LONG).show();
+//
+//			}
+//		});
 		
-		mDummyButton.setOnClickListener( 
-				new View.OnClickListener() {
-					
-					  public void onClick(View arg0) {
-		 
-						 Log.i(TAG, "FullscreenActivity::make toast");
-					     Toast.makeText(getApplicationContext(), 
-		                               "Button is clicked", Toast.LENGTH_LONG).show();
-		 
-					  }
-					}
-			);
-		Log.i(TAG,"FullscreenActivity::onCreate - exit");
+		
+		Resources res = getResources();
+		final String noteTickerText = res.getString(R.string.notification_ticker);
+		final String noteTitle = res.getString(R.string.notification_title);
+		final String noteContentText = res.getString(R.string.notification_content);
+		
+		mDummyButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				// Define the Notification's expanded message and Intent:
+				Notification.Builder notificationBuilder = new Notification.Builder(
+						getApplicationContext())
+						.setTicker(noteTickerText)
+						.setSmallIcon(android.R.drawable.stat_sys_warning)
+						.setAutoCancel(true)
+						.setContentTitle(noteTitle)
+						.setContentText(noteContentText);
+
+				// Pass the Notification to the NotificationManager:
+				NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+				mNotificationManager.notify(MY_NOTIFICATION_ID,
+						notificationBuilder.build());
+			}
+		});
+
+		// ------------------------------------------------------
+
+		Log.i(TAG, "FullscreenActivity::onCreate - exit");
 	}
 
 	@Override
@@ -166,9 +203,9 @@ public class FullscreenActivity extends Activity {
 			}
 			return false;
 		}
-		
+
 	};
-	
+
 	Handler mHideHandler = new Handler();
 	Runnable mHideRunnable = new Runnable() {
 		@Override
