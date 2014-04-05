@@ -25,17 +25,29 @@
             </intent-filter>
         </activity>
 
+
+        
+<!--         <activity -->
+<!--             android:name="ca.nmsasaki.silentphonetimer.ShortcutActivity" -->
+<!--             android:exported="true" -->
+<!--             android:label="@string/app_diplay_name" > -->
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.CREATE_SHORTCUT" /> -->
+
+<!--                 <category android:name="android.intent.category.DEFAULT" /> -->
+<!--             </intent-filter> -->
+<!--         </activity> -->
+
         <service
             android:name="ca.nmsasaki.silentphonetimer.WidgetService"
             android:enabled="true"
             android:exported="false" >
         </service>
-        
+
         <receiver
+            android:name="ca.nmsasaki.silentphonetimer.MyWidgetProvider"
             android:icon="@drawable/ic_launcher"
-            android:label="@string/app_diplay_name" 
-            android:name="ca.nmsasaki.silentphonetimer.MyWidgetProvider" >
-            
+            android:label="@string/widget_test_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

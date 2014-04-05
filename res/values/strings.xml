@@ -5,5 +5,6 @@
     <string name="app_diplay_name">Silent Phone Timer</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="widget_test_name">000 Widget</string>
 
 </resources>

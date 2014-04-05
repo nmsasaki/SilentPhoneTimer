@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:minHeight="40dp"
-    android:minWidth="40dp"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<!--     android:padding="@dimen/widget_margin" > -->
 
-    <ImageButton
-        android:id="@+id/widget_button"
+    <TextView
+        android:id="@+id/widget_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/app_diplay_name"
-        android:src="@drawable/ic_launcher" >
-    </ImageButton>
+        android:background="#FFFFFF"
+        android:text="0"
+        >
+        
+    </TextView>
+    
+<!--     <ImageButton -->
+<!--         android:id="@+id/widget_button" -->
+<!--         android:layout_width="match_parent" -->
+<!--         android:layout_height="match_parent" -->
+<!--         android:background="@android:color/transparent" -->
+<!--         android:contentDescription="@string/app_diplay_name" -->
+<!--         android:src="@drawable/ic_launcher" > -->
+<!--     </ImageButton> -->
+    
+<!--     android:contentDescription primarily for accessibility -->
 
 </FrameLayout>

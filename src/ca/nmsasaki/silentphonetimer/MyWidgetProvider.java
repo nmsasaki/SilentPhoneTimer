@@ -1,8 +1,11 @@
 package ca.nmsasaki.silentphonetimer;
 
+import java.util.Random;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 //import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -37,19 +40,32 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 		Log.i(TAG, "MyWidgetProvider::onUpdate - enter");
 
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-		          R.layout.widget_layout);
-		
-		// Register an onClickListener
-		Intent intent = new Intent(context, MyWidgetProvider.class);
+		// Get all ids
+		ComponentName thisWidget = new ComponentName(context,
+				MyWidgetProvider.class);
+		int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+		for (int widgetId : allWidgetIds) {
+			// create some random data
+			// create some random data
+			int number = (new Random().nextInt(100));
+			RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+					R.layout.widget_layout);
+			// Set the text
+			remoteViews.setTextViewText(R.id.widget_text,
+					String.valueOf(number));
 
-		intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+			// Register an onClickListener
+			Intent intent = new Intent(context, MyWidgetProvider.class);
 
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
-				intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		
-		remoteViews.setOnClickPendingIntent(R.id.widget_button, pendingIntent);
-		// appWidgetManager.updateAppWidget(widgetId, remoteViews);
+			intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+			intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+					0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+			
+			remoteViews.setOnClickPendingIntent(R.id.widget_text, pendingIntent);
+			appWidgetManager.updateAppWidget(widgetId, remoteViews);
+		}
 
 		// // Update the widgets via the service
 		// context.startService(intent);
