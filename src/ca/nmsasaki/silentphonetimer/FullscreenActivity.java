@@ -154,10 +154,10 @@ public class FullscreenActivity extends Activity {
 		
 		
 		Resources res = getResources();
-		final String notiTickerText = res.getString(R.string.notification_ticker);
+		final String notiTickerText = res.getString(R.string.notification_ON_ticker);
 		final String notiTitle = res.getString(R.string.notification_title);
-		final String notiContentText = res.getString(R.string.notification_content);
-		final String notiCancel = res.getString(R.string.notification_cancel);
+		final String notiContentText = res.getString(R.string.notification_ON_content);
+		final String notiCancel = res.getString(R.string.notification_ON_cancel);
 		
 		mDummyButton.setOnClickListener(new OnClickListener() {
 
