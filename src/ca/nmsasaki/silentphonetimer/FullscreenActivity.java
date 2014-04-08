@@ -18,9 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.RemoteViews.RemoteView;
-//import android.widget.Toast;
-import android.widget.RemoteViews;
+//import android.widget.RemoteViews;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -32,9 +30,7 @@ public class FullscreenActivity extends Activity {
 
 	private static final String TAG = "SilentPhoneTimer";
 
-	private final RemoteViews mNotificationView = new RemoteViews(
-			"ca.nmsasaki.silentphonetimer",
-			R.layout.notification_layout);
+	//private final RemoteViews mNotificationView = new RemoteViews("ca.nmsasaki.silentphonetimer", R.layout.notification_layout);
 
 	// Notification ID to allow for future updates
 	private static final int MY_NOTIFICATION_ID = 1;
