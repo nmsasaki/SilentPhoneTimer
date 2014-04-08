@@ -19,16 +19,6 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	private static final long SILENT_DURATION_MILLISECONDS = 1 * 60 * 1000;
 	private static final String TAG = "SilentPhoneTimer";
 	private static final int MY_NOTIFICATION_ID = 1;
-//	private static final String PINTENT_EXTRAS_TIMEREXPIRED = "TIMEREXPIRED";
-//	private static final String PINTENT_EXTRAS_USERCANCELED = "USERCANCELED";
-	
-	private static final String INTENT_EXTRAS_CANCEL_REASON_LABEL = "CANCEL_REASON";
-	private static final int INTENT_EXTRAS_CANCEL_REASON_NA = 0;
-	private static final int INTENT_EXTRAS_CANCEL_REASON_TIMEREXPIRED = 2;
-	private static final int INTENT_EXTRAS_CANCEL_REASON_USERCANCELED = 4;
-	
-//	private static final int PINTENT_TIMER_ID = 1;
-//	private static final int PINTENT_CANCEL_ID = 2;
 
 	private static PendingIntent mAlarmIntent = null;
 	private static boolean mOnInitialize = true;
@@ -58,12 +48,16 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_APPWIDGET_UPDATE (user click)");
 				// Perform actions before notifying user - this will expose performance delays and show bugs ----------------------
 				// ----------------------------------------------------
+				
+				//TODO: Change to Silent Notifications
 
+				//TODO: Add handling for subsequent clicks
+				//			* Cancel old timer, and create new one (if I use the same Pending Intent, do I need to cancel?)
+				
 				// Create timer for Canceling Silent Mode -----------------------------------------
 				AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 				Intent intentAlarmReceiver = new Intent(context, MyWidgetProvider.class);
 				intentAlarmReceiver.setAction(Intent.ACTION_DELETE);
-				intentAlarmReceiver.putExtra(INTENT_EXTRAS_CANCEL_REASON_LABEL, INTENT_EXTRAS_CANCEL_REASON_TIMEREXPIRED);
 				mAlarmIntent = PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
 
 				//final long alarmExpire = SystemClock.elapsedRealtime() + SILENT_DURATION_MILLISECONDS; // this uptime is ms since Jan 1, 1970.
@@ -99,8 +93,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				
 				// Pending intent to be fired when notification is clicked
 				Intent notiIntent = new Intent(context, MyWidgetProvider.class);
-				notiIntent.setAction(Intent.ACTION_DELETE);
-				notiIntent.putExtra(INTENT_EXTRAS_CANCEL_REASON_LABEL, INTENT_EXTRAS_CANCEL_REASON_USERCANCELED);
+				notiIntent.setAction(Intent.ACTION_EDIT);
 				PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, notiIntent, 0);
 
 				
@@ -121,25 +114,9 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		else if (intent.getAction() == Intent.ACTION_DELETE) {
 			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: START");
 			
-			final int reasonCode = intent.getIntExtra(INTENT_EXTRAS_CANCEL_REASON_LABEL, INTENT_EXTRAS_CANCEL_REASON_NA);
-			
-			Log.i(TAG, String.format("reasonCode=%d", reasonCode));
-
-			if (reasonCode == INTENT_EXTRAS_CANCEL_REASON_USERCANCELED) 
-			{
-				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: USER CANCELED");
-				// cancel timer and clear notification
-				AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-				if (alarmMgr!= null) {
-				    alarmMgr.cancel(mAlarmIntent);
-				}
-				
-			}
-			
-			else if (reasonCode == INTENT_EXTRAS_CANCEL_REASON_TIMEREXPIRED) 
-			{	
 				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: TIMER EXPIRED");
 				
+				//TODO: Change to Normal Notifications
 				// If the timer expired Build notification ------------------------------------------------
 				final long alarmExpired = System.currentTimeMillis();
 				DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
@@ -152,6 +129,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				String notiContentText = context.getString(R.string.notification_OFF_timer);
 				notiContentText = String.format(notiContentText, dateString);
 				
+				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: UPDATE NOTIFICATION");
 				// Define the Notification's expanded message and Intent:
 				Notification.Builder notificationBuilder = new Notification.Builder(context)
 						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
@@ -162,13 +140,26 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 				mNotificationManager.notify(MY_NOTIFICATION_ID, notificationBuilder.build());
 
-				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: FINISHED");
-			}
-			else
-			{
-				Log.e(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: UNKNOWN REASON");
+				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: FINISH");
+			
+		}
+		else if (intent.getAction() == Intent.ACTION_EDIT) {
+			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: START");
+
+			//TODO: Change to Normal Notifications
+
+			// cancel timer and clear notification
+			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL ALARM");
+			AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+			if (alarmMgr!= null) {
+			    alarmMgr.cancel(mAlarmIntent);
 			}
 			
+			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL NOTIFICATION");
+			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.cancel(MY_NOTIFICATION_ID);
+			
+			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: FINISH");
 		}
 		else
 		{
