@@ -28,7 +28,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	public void onEnabled(Context context) {
 		super.onEnabled(context);
 
-		Log.i(TAG, "MyWidgetProvider::onEnabled");
+		Log.d(TAG, "MyWidgetProvider::onEnabled");
 
 	}
 
@@ -36,7 +36,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	public void onReceive(Context context, Intent intent) {
 		//super.onReceive(context, intent);
 
-		Log.i(TAG, "MyWidgetProvider::onReceive - enter");
+		Log.d(TAG, "MyWidgetProvider::onReceive - enter");
 
 		if (intent.getAction() == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
 			
@@ -73,15 +73,17 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				
 				// ----------------------------------------------------
 
-				DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
+				final DateFormat dateFormatterUser = DateFormat.getTimeInstance(DateFormat.SHORT);
+				final DateFormat dateFormatterLog = DateFormat.getTimeInstance(DateFormat.LONG);
 				// TimeZone tz = dateFormatter.getTimeZone(); - for testing timezone
 				// String dateStringTest = dateFormatter.format(SystemClock.elapsedRealtime());
-				String dateString = dateFormatter.format(mAlarmExpire);
+				final String dateStringUser = dateFormatterUser.format(mAlarmExpire);
+				final String dateStringLog = dateFormatterLog.format(mAlarmExpire);
 
-				// Log.i(TAG, "MyWidgetProvider::onReceive time=" + dateStringTest + ", " + dateString + ", TZ=" + tz.getDisplayName());
+				Log.i(TAG, "MyWidgetProvider::onReceive expireTime=" + dateStringLog);
 				// toast
 				String toastText = context.getString(R.string.toast_ON);
-				toastText = String.format(toastText, dateString);
+				toastText = String.format(toastText, dateStringUser);
 				Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
 
 				
@@ -93,7 +95,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				//String notiTickerText = context.getString(R.string.notification_ON_ticker);
 				//notiTickerText = String.format(notiTickerText, dateString);
 				String notiContentText = context.getString(R.string.notification_ON_content);
-				notiContentText = String.format(notiContentText, dateString);
+				notiContentText = String.format(notiContentText, dateStringUser);
 
 				// Intent 1: When main part of notification is clicked, just return to home screen
 				// Intent 2: When cancel is clicked, remove notification and enable regular notifications
@@ -119,24 +121,27 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			
 		}
 		else if (intent.getAction() == Intent.ACTION_DELETE) {
-			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: START");
+			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: START");
 			
 				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: TIMER EXPIRED");
 				
 				//TODO: Change to Normal Notifications
 				// If the timer expired Build notification ------------------------------------------------
 				final long alarmExpired = System.currentTimeMillis();
-				DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
-				String dateString = dateFormatter.format(alarmExpired);
+				final DateFormat dateFormatterUser = DateFormat.getTimeInstance(DateFormat.SHORT);
+				final DateFormat dateFormatterLog = DateFormat.getTimeInstance(DateFormat.LONG);
+				String dateStringUser = dateFormatterUser.format(alarmExpired);
+				String dateStringLog = dateFormatterLog.format(alarmExpired);
+				Log.i(TAG, "Actual Expiry Time:" + dateStringLog);
 				
 				final String notiTitle = context.getString(R.string.notification_title);
 //				final String notiCancel = context.getString(R.string.notification_OFF_cancel);
 //				String notiTickerText = context.getString(R.string.notification_OFF_ticker);
 //				notiTickerText = String.format(notiTickerText, dateString);
 				String notiContentText = context.getString(R.string.notification_OFF_timer);
-				notiContentText = String.format(notiContentText, dateString);
+				notiContentText = String.format(notiContentText, dateStringUser);
 				
-				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: UPDATE NOTIFICATION");
+				Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: UPDATE NOTIFICATION");
 				// Define the Notification's expanded message and Intent:
 				Notification.Builder notificationBuilder = new Notification.Builder(context)
 						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
@@ -149,11 +154,11 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 			    mAlarmIntent = null;
 
-				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: FINISH");
+				Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: FINISH");
 			
 		}
 		else if (intent.getAction() == Intent.ACTION_EDIT) {
-			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: START");
+			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: START");
 
 			//TODO: Change to Normal Notifications
 
@@ -164,12 +169,12 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			    alarmMgr.cancel(mAlarmIntent);
 			}
 			
-			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL NOTIFICATION");
+			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL NOTIFICATION");
 			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.cancel(MY_NOTIFICATION_ID);
 
 		    mAlarmIntent = null;
-			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: FINISH");
+			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: FINISH");
 		}
 		else
 		{
@@ -179,14 +184,14 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		// Toast.makeText(context, "Touched view", Toast.LENGTH_SHORT).show();
 
 		super.onReceive(context, intent);
-		Log.i(TAG, "MyWidgetProvider::onReceive - exit");
+		Log.d(TAG, "MyWidgetProvider::onReceive - exit");
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
 			int[] appWidgetIds) {
 
-		Log.i(TAG, "MyWidgetProvider::onUpdate - enter");
+		Log.d(TAG, "MyWidgetProvider::onUpdate - enter");
 
 		ComponentName thisWidget = new ComponentName(context, MyWidgetProvider.class);
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
@@ -204,7 +209,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		// context.startService(intent);
 		// ----------------------------------------------------
 
-		Log.i(TAG, "MyWidgetProvider::onUpdate - exit");
+		Log.d(TAG, "MyWidgetProvider::onUpdate - exit");
 
 	}
 

@@ -61,7 +61,7 @@ public class FullscreenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.i(TAG, "FullscreenActivity::onCreate - enter");
+		Log.d(TAG, "FullscreenActivity::onCreate - enter");
 
 		setContentView(R.layout.activity_fullscreen);
 
@@ -181,7 +181,7 @@ public class FullscreenActivity extends Activity {
 
 		// ------------------------------------------------------
 
-		Log.i(TAG, "FullscreenActivity::onCreate - exit");
+		Log.d(TAG, "FullscreenActivity::onCreate - exit");
 	}
 
 	@Override
