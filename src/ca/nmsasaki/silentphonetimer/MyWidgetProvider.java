@@ -193,8 +193,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		// Register an onClickListener for widget update ----------------------------------------------------
 		Intent updateIntent = new Intent(context, MyWidgetProvider.class);
 		updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-		updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-		PendingIntent updatePIntent = PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		// updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+		PendingIntent updatePIntent = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
 		remoteViews.setOnClickPendingIntent(R.id.widget_image, updatePIntent);
 		appWidgetManager.updateAppWidget(thisWidget, remoteViews);
 		// ----------------------------------------------------

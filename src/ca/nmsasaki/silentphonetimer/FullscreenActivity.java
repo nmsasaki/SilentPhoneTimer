@@ -4,19 +4,12 @@ import ca.nmsasaki.silentphonetimer.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 //import android.widget.RemoteViews;
 
@@ -33,7 +26,7 @@ public class FullscreenActivity extends Activity {
 	//private final RemoteViews mNotificationView = new RemoteViews("ca.nmsasaki.silentphonetimer", R.layout.notification_layout);
 
 	// Notification ID to allow for future updates
-	private static final int MY_NOTIFICATION_ID = 1;
+	// private static final int MY_NOTIFICATION_ID = 1;
 	
 	private Button mDummyButton = null;
 	/**
@@ -153,36 +146,38 @@ public class FullscreenActivity extends Activity {
 //		});
 		
 		
-		Resources res = getResources();
-		final String notiTitle = res.getString(R.string.notification_title);
-		final String notiContentText = res.getString(R.string.notification_ON_content);
-		final String notiCancel = res.getString(R.string.notification_ON_cancel);
-		
-		mDummyButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-
-				// Pending intent to be fired when notification is clicked
-				Intent intent = new Intent(v.getContext(), FullscreenActivity.class);
-				PendingIntent cancelPendingIntent = PendingIntent.getActivity(v.getContext(), 01,
-						intent, Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-				
-				// Define the Notification's expanded message and Intent:
-				Notification.Builder notificationBuilder = new Notification.Builder(
-						getApplicationContext())
-						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
-						.setContentTitle(notiTitle)
-						.setContentText(notiContentText)
-						.addAction(android.R.drawable.ic_lock_silent_mode_off, notiCancel, cancelPendingIntent);
-
-				// Pass the Notification to the NotificationManager:
-				NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-				mNotificationManager.notify(MY_NOTIFICATION_ID,
-						notificationBuilder.build());
-			}
-		});
+//		Resources res = getResources();
+//		final String notiTitle = res.getString(R.string.notification_title);
+//		final String notiContentText = res.getString(R.string.notification_ON_content);
+//		final String notiCancel = res.getString(R.string.notification_ON_cancel);
+//		
+//		mDummyButton.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//
+//				Log.i(TAG, "FullscreenActivity::onButtonClick");
+//
+//				// Pending intent to be fired when notification is clicked
+//				Intent intent = new Intent(v.getContext(), FullscreenActivity.class);
+//				PendingIntent cancelPendingIntent = PendingIntent.getActivity(v.getContext(), 01,
+//						intent, Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//
+//				
+//				// Define the Notification's expanded message and Intent:
+//				Notification.Builder notificationBuilder = new Notification.Builder(
+//						getApplicationContext())
+//						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
+//						.setContentTitle(notiTitle)
+//						.setContentText(notiContentText)
+//						.addAction(android.R.drawable.ic_lock_silent_mode_off, notiCancel, cancelPendingIntent);
+//
+//				// Pass the Notification to the NotificationManager:
+//				NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//				mNotificationManager.notify(MY_NOTIFICATION_ID,
+//						notificationBuilder.build());
+//			}
+//		});
 
 		// ------------------------------------------------------
 
