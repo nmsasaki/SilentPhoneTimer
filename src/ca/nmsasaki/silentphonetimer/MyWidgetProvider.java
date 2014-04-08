@@ -21,6 +21,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	private static final int MY_NOTIFICATION_ID = 1;
 
 	private static PendingIntent mAlarmIntent = null;
+	private static Toast mToast = null;
 	private static boolean mOnInitialize = true;
 	private static long mAlarmExpire = 0;
 
@@ -84,7 +85,12 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				// toast
 				String toastText = context.getString(R.string.toast_ON);
 				toastText = String.format(toastText, dateStringUser);
-				Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+				
+				if (mToast!=null){
+					mToast.cancel();
+				}
+				mToast = Toast.makeText(context, toastText, Toast.LENGTH_LONG);
+				mToast.show();
 
 				
 				// Build notification ------------------------------------------------
