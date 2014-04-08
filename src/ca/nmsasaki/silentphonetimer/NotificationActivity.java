@@ -8,6 +8,6 @@ public class NotificationActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.notification_layout);
+		setContentView(R.layout.notification_on_layout);
 	}
 }

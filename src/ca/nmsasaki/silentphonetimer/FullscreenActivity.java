@@ -154,7 +154,6 @@ public class FullscreenActivity extends Activity {
 		
 		
 		Resources res = getResources();
-		final String notiTickerText = res.getString(R.string.notification_ON_ticker);
 		final String notiTitle = res.getString(R.string.notification_title);
 		final String notiContentText = res.getString(R.string.notification_ON_content);
 		final String notiCancel = res.getString(R.string.notification_ON_cancel);
@@ -173,7 +172,6 @@ public class FullscreenActivity extends Activity {
 				// Define the Notification's expanded message and Intent:
 				Notification.Builder notificationBuilder = new Notification.Builder(
 						getApplicationContext())
-						.setTicker(notiTickerText)
 						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
 						.setContentTitle(notiTitle)
 						.setContentText(notiContentText)
