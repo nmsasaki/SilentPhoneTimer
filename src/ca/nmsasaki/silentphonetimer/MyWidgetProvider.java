@@ -22,6 +22,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 	private static PendingIntent mAlarmIntent = null;
 	private static boolean mOnInitialize = true;
+	private static long mAlarmExpire = 0;
 
 	@Override
 	public void onEnabled(Context context) {
@@ -50,26 +51,32 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				// ----------------------------------------------------
 				
 				//TODO: Change to Silent Notifications
-
-				//TODO: Add handling for subsequent clicks
-				//			* Cancel old timer, and create new one (if I use the same Pending Intent, do I need to cancel?)
 				
-				// Create timer for Canceling Silent Mode -----------------------------------------
 				AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-				Intent intentAlarmReceiver = new Intent(context, MyWidgetProvider.class);
-				intentAlarmReceiver.setAction(Intent.ACTION_DELETE);
-				mAlarmIntent = PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
+				
+				if (mAlarmIntent == null) {
+					// Create timer for Canceling Silent Mode -----------------------------------------
+					Intent intentAlarmReceiver = new Intent(context, MyWidgetProvider.class);
+					intentAlarmReceiver.setAction(Intent.ACTION_DELETE);
+					mAlarmIntent = PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
 
-				//final long alarmExpire = SystemClock.elapsedRealtime() + SILENT_DURATION_MILLISECONDS; // this uptime is ms since Jan 1, 1970.
-				final long alarmExpire = System.currentTimeMillis() + SILENT_DURATION_MILLISECONDS; // this based on system time
-				alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmExpire, mAlarmIntent);
+					//final long alarmExpire = SystemClock.elapsedRealtime() + SILENT_DURATION_MILLISECONDS; // this uptime is ms since Jan 1, 1970.
+					mAlarmExpire = System.currentTimeMillis() + SILENT_DURATION_MILLISECONDS; // this based on system time
+					alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire, mAlarmIntent);
+				}
+				else
+				{
+					mAlarmExpire = mAlarmExpire + SILENT_DURATION_MILLISECONDS; // this based on system time
+					alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire, mAlarmIntent);
+				}
+				
 				
 				// ----------------------------------------------------
 
 				DateFormat dateFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
 				// TimeZone tz = dateFormatter.getTimeZone(); - for testing timezone
 				// String dateStringTest = dateFormatter.format(SystemClock.elapsedRealtime());
-				String dateString = dateFormatter.format(alarmExpire);
+				String dateString = dateFormatter.format(mAlarmExpire);
 
 				// Log.i(TAG, "MyWidgetProvider::onReceive time=" + dateStringTest + ", " + dateString + ", TZ=" + tz.getDisplayName());
 				// toast
@@ -140,6 +147,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 				mNotificationManager.notify(MY_NOTIFICATION_ID, notificationBuilder.build());
 
+			    mAlarmIntent = null;
+
 				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: FINISH");
 			
 		}
@@ -151,14 +160,15 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			// cancel timer and clear notification
 			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL ALARM");
 			AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-			if (alarmMgr!= null) {
+			if (alarmMgr!= null && mAlarmIntent != null) {
 			    alarmMgr.cancel(mAlarmIntent);
 			}
 			
 			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL NOTIFICATION");
 			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.cancel(MY_NOTIFICATION_ID);
-			
+
+		    mAlarmIntent = null;
 			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: FINISH");
 		}
 		else
