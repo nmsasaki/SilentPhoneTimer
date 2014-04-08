@@ -7,12 +7,11 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="widget_test_name">0 - Silent Phone Timer</string>
     <string name="notification_title">Silent Phone Timer</string>
-    <string name="notification_ON_ticker">Notifications disabled until xx:xx</string>
-    <string name="notification_ON_content">Phone will be quiet until xx:xx</string>
-    <string name="notification_ON_cancel">Enable Normal now</string>
-    <string name="notification_OFF_ticker">Notifications set to Normal at xx:xx</string>
-    <string name="notification_OFF_content">Phone Notifications back to Normal</string>
+    <string name="notification_ON_ticker">Phone silent until %s</string>
+    <string name="notification_ON_content">Phone silent until %s</string>
+    <string name="notification_ON_cancel">Restore normal notifications</string>
+    <string name="notification_OFF_ticker">Normal notifications restored (%s)</string>
+    <string name="notification_OFF_content">Normal notifications restored (%s)</string>
     <string name="notification_OFF_cancel">Dismiss</string>
-    <string name="toast_ON">Silent Mode ON</string>
-    <string name="toast_OFF">Normal Notifications</string>
+    <string name="toast_ON">Silent until %s</string>
 </resources>
