@@ -9,6 +9,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		Log.d(TAG, "MyWidgetProvider::onReceive - enter");
 
 		if (intent.getAction() == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
+			// ACTION_APPWIDGET_UPDATE means User clicked on widget
 			
 			if (mOnInitialize) {
 				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_APPWIDGET_UPDATE (initialize)");
@@ -52,6 +54,33 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				// ----------------------------------------------------
 				
 				//TODO: Change to Silent Notifications
+				
+				AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+				final int curAudioMode = audioManager.getRingerMode();
+				String curModeString = "UNKNOWN";
+				
+				switch (curAudioMode) {
+				case AudioManager.RINGER_MODE_NORMAL:
+					curModeString = "NORMAL";
+					break;
+				case AudioManager.RINGER_MODE_SILENT:
+					curModeString = "SILENT";
+					break;
+				case AudioManager.RINGER_MODE_VIBRATE:
+					curModeString = "VIBRATE";
+					break;
+				default:
+					break;
+				}
+				
+				Log.i(TAG, String.format("AudioMode: Current Mode = %s", curModeString));
+				
+				if (curAudioMode != AudioManager.RINGER_MODE_SILENT) {
+					Log.i(TAG, "AudioMode: Set to silent");
+					audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+				}
+						        
+				// ----------------------------------------------------
 				
 				AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 				
@@ -127,11 +156,37 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			
 		}
 		else if (intent.getAction() == Intent.ACTION_DELETE) {
+			// ACTION_DELETE means timer expired, so slient action should be "deleted"
 			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: START");
 			
 				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: TIMER EXPIRED");
 				
 				//TODO: Change to Normal Notifications
+				AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+				final int curAudioMode = audioManager.getRingerMode();
+				String curModeString = "UNKNOWN";
+				
+				switch (curAudioMode) {
+				case AudioManager.RINGER_MODE_NORMAL:
+					curModeString = "NORMAL";
+					break;
+				case AudioManager.RINGER_MODE_SILENT:
+					curModeString = "SILENT";
+					break;
+				case AudioManager.RINGER_MODE_VIBRATE:
+					curModeString = "VIBRATE";
+					break;
+				default:
+					break;
+				}
+				Log.i(TAG, String.format("Current Audio Mode = %s", curModeString));
+				
+				if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
+					Log.i(TAG, "AudioMode: Set to normal");
+					audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				}
+				// -------------------------------------------
+				
 				// If the timer expired Build notification ------------------------------------------------
 				final long alarmExpired = System.currentTimeMillis();
 				final DateFormat dateFormatterUser = DateFormat.getTimeInstance(DateFormat.SHORT);
@@ -164,9 +219,35 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			
 		}
 		else if (intent.getAction() == Intent.ACTION_EDIT) {
+			// ACTION_EDIT means user canceled the mode manually (and "edit")
 			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: START");
 
 			//TODO: Change to Normal Notifications
+			AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+			final int curAudioMode = audioManager.getRingerMode();
+			String curModeString = "UNKNOWN";
+			
+			switch (curAudioMode) {
+			case AudioManager.RINGER_MODE_NORMAL:
+				curModeString = "NORMAL";
+				break;
+			case AudioManager.RINGER_MODE_SILENT:
+				curModeString = "SILENT";
+				break;
+			case AudioManager.RINGER_MODE_VIBRATE:
+				curModeString = "VIBRATE";
+				break;
+			default:
+				break;
+			}
+			Log.i(TAG, String.format("Current Audio Mode = %s", curModeString));
+			
+			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
+				Log.i(TAG, "AudioMode: Set to normal");
+				audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+			}
+			// -------------------------------------------
+			
 
 			// cancel timer and clear notification
 			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL ALARM");
