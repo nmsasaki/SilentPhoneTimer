@@ -30,7 +30,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
         android:contentDescription="@string/app_diplay_name"
-        android:src="@drawable/ic_launcher" >
+        android:src="@drawable/ic_launchf" >
         
 </ImageView>
     

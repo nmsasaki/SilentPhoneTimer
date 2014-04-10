@@ -144,7 +144,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				// Define the Notification's expanded message and Intent:
 				Notification.Builder notificationBuilder = new Notification.Builder(context)
 						//.setTicker(notiTickerText)
-						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
+						//.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
+						.setSmallIcon(R.drawable.ic_notify)
 						.setContentTitle(notiTitle)
 						.setContentText(notiContentText)
 						.addAction(android.R.drawable.ic_lock_silent_mode_off, notiCancel, cancelPendingIntent);
@@ -205,7 +206,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: UPDATE NOTIFICATION");
 				// Define the Notification's expanded message and Intent:
 				Notification.Builder notificationBuilder = new Notification.Builder(context)
-						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
+						//.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
+						.setSmallIcon(R.drawable.ic_notify)
 						.setContentTitle(notiTitle)
 						.setContentText(notiContentText);
 

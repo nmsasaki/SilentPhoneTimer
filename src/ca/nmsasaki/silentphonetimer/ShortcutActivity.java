@@ -20,7 +20,7 @@ public class ShortcutActivity extends Activity {
 
 	    i.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutActivity);
 	    i.putExtra(Intent.EXTRA_SHORTCUT_NAME, R.string.app_diplay_name);
-	    i.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher));
+	    i.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launchf));
 	    
 	    setResult(RESULT_OK, i);
 	    

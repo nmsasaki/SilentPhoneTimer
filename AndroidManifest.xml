@@ -10,7 +10,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_launchf"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -46,7 +46,7 @@
 
         <receiver
             android:name="ca.nmsasaki.silentphonetimer.MyWidgetProvider"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@drawable/ic_launchf"
             android:label="@string/widget_test_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
