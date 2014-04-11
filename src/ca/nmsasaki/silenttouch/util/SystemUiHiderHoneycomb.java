@@ -1,4 +1,4 @@
-package ca.nmsasaki.silentphonetimer.util;
+package ca.nmsasaki.silenttouch.util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

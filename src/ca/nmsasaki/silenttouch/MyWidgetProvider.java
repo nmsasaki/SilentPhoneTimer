@@ -1,4 +1,4 @@
-package ca.nmsasaki.silentphonetimer;
+package ca.nmsasaki.silenttouch;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -15,10 +15,12 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 import java.text.DateFormat;
 
+import ca.nmsasaki.silentphonetimer.R;
+
 public class MyWidgetProvider extends AppWidgetProvider {
 
 	private static final long SILENT_DURATION_MILLISECONDS = 1 * 60 * 1000;
-	private static final String TAG = "SilentPhoneTimer";
+	private static final String TAG = "SilentTouch";
 	private static final int MY_NOTIFICATION_ID = 1;
 
 	private static PendingIntent mAlarmIntent = null;

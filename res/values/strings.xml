@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SilentPhoneTimer</string>
+    <string name="app_name">SilentTouch</string>
     <string name="app_diplay_name">Silent Touch</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>

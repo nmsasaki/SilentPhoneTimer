@@ -1,6 +1,7 @@
-package ca.nmsasaki.silentphonetimer;
+package ca.nmsasaki.silenttouch;
 
-import ca.nmsasaki.silentphonetimer.util.SystemUiHider;
+import ca.nmsasaki.silentphonetimer.R;
+import ca.nmsasaki.silenttouch.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -21,7 +22,7 @@ import android.widget.Button;
  */
 public class FullscreenActivity extends Activity {
 
-	private static final String TAG = "SilentPhoneTimer";
+	private static final String TAG = "SilentTouch";
 
 	//private final RemoteViews mNotificationView = new RemoteViews("ca.nmsasaki.silentphonetimer", R.layout.notification_layout);
 

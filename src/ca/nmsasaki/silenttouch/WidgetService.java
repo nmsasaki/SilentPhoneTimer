@@ -1,4 +1,4 @@
-package ca.nmsasaki.silentphonetimer;
+package ca.nmsasaki.silenttouch;
 
 //import android.app.PendingIntent;
 import android.app.Service;
@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 public class WidgetService extends Service {
 
-	private static final String TAG = "SilentPhoneTimer";
+	private static final String TAG = "SilentTouch";
 
 	@Override
 	  public void onStart(Intent intent, int startId) {

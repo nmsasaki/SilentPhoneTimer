@@ -1,5 +1,6 @@
-package ca.nmsasaki.silentphonetimer;
+package ca.nmsasaki.silenttouch;
 
+import ca.nmsasaki.silentphonetimer.R;
 import android.app.Activity;
 import android.os.Bundle;
 

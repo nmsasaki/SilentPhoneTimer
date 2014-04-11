@@ -1,5 +1,6 @@
-package ca.nmsasaki.silentphonetimer;
+package ca.nmsasaki.silenttouch;
 
+import ca.nmsasaki.silentphonetimer.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +8,7 @@ import android.util.Log;
 
 public class ShortcutActivity extends Activity {
 
-	private static final String TAG = "SilentPhoneTimer";
+	private static final String TAG = "SilentTouch";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
