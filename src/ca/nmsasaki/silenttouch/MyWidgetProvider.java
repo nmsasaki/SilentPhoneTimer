@@ -26,14 +26,17 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	private static final String TAG = "SilentTouch";
 	private static final int MY_NOTIFICATION_ID = 1;
 
-	private static PendingIntent mAlarmIntent = null;
-	private static Toast mToast = null;
-
 	private static final String INTENT_ACTION_WIDGET_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_WIDGET_CLICK";
 	private static final String INTENT_ACTION_NOTIFICATION_CANCEL_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_NOTIFICATION_CANCEL_CLICK";
 	private static final String INTENT_ACTION_TIMER_EXPIRED = "ca.nmsasaki.silenttouch.INTENT_ACTION_TIMER_EXPIRED";
 
+	// mToast is used to cancel an existing toast if user clicks on widget in succession
+	// should be ok if this state gets cleaned up by android
+	private static Toast mToast = null;
+	// TODO: remove dependence on this variable used for updating an existing alarm
 	private static long mAlarmExpire = 0;
+	// TODO: remove dependence on this variable used for updating exiting timer
+	private static PendingIntent mAlarmIntent = null;
 
 	@Override
 	public void onEnabled(Context context) {
