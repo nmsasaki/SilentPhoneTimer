@@ -23,7 +23,11 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 	private static PendingIntent mAlarmIntent = null;
 	private static Toast mToast = null;
-	private static boolean mOnInitialize = true;
+
+	private static final String INTENT_ACTION_WIDGET_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_WIDGET_CLICK";
+	private static final String INTENT_ACTION_NOTIFICATION_CANCEL_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_NOTIFICATION_CANCEL_CLICK";
+	private static final String INTENT_ACTION_TIMER_EXPIRED = "ca.nmsasaki.silenttouch.INTENT_ACTION_TIMER_EXPIRED";
+
 	private static long mAlarmExpire = 0;
 
 	@Override
@@ -31,204 +35,31 @@ public class MyWidgetProvider extends AppWidgetProvider {
 		super.onEnabled(context);
 
 		Log.d(TAG, "MyWidgetProvider::onEnabled");
-
 	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		//super.onReceive(context, intent);
+		// super.onReceive(context, intent);
 
-		Log.d(TAG, "MyWidgetProvider::onReceive - enter");
+		Log.i(TAG, "MyWidgetProvider::onReceive - enter");
 
-		if (intent.getAction() == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
-			// ACTION_APPWIDGET_UPDATE means User clicked on widget
+		final String curIntentAction = intent.getAction();
+		Log.i(TAG, "onReceive Intent=" + curIntentAction);
+
+		if (curIntentAction == INTENT_ACTION_WIDGET_CLICK) {
+			// User clicked on widget
+			// Perform actions before notifying user
+			// this will expose performance delays and show bugs
 			
-			if (mOnInitialize) {
-				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_APPWIDGET_UPDATE (initialize)");
-				mOnInitialize = false;
-			}
-			else
-			{
-				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_APPWIDGET_UPDATE (user click)");
-				// Perform actions before notifying user - this will expose performance delays and show bugs ----------------------
-				// ----------------------------------------------------
-				
-				//TODO: Change to Silent Notifications
-				
-				AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-				final int curAudioMode = audioManager.getRingerMode();
-				String curModeString = "UNKNOWN";
-				
-				switch (curAudioMode) {
-				case AudioManager.RINGER_MODE_NORMAL:
-					curModeString = "NORMAL";
-					break;
-				case AudioManager.RINGER_MODE_SILENT:
-					curModeString = "SILENT";
-					break;
-				case AudioManager.RINGER_MODE_VIBRATE:
-					curModeString = "VIBRATE";
-					break;
-				default:
-					break;
-				}
-				
-				Log.i(TAG, String.format("AudioMode: Current Mode = %s", curModeString));
-				
-				if (curAudioMode != AudioManager.RINGER_MODE_SILENT) {
-					Log.i(TAG, "AudioMode: Set to silent");
-					audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-				}
-						        
-				// ----------------------------------------------------
-				
-				AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-				
-				if (mAlarmIntent == null) {
-					// Create timer for Canceling Silent Mode -----------------------------------------
-					Intent intentAlarmReceiver = new Intent(context, MyWidgetProvider.class);
-					intentAlarmReceiver.setAction(Intent.ACTION_DELETE);
-					mAlarmIntent = PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
-
-					//final long alarmExpire = SystemClock.elapsedRealtime() + SILENT_DURATION_MILLISECONDS; // this uptime is ms since Jan 1, 1970.
-					mAlarmExpire = System.currentTimeMillis() + SILENT_DURATION_MILLISECONDS; // this based on system time
-					alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire, mAlarmIntent);
-				}
-				else
-				{
-					mAlarmExpire = mAlarmExpire + SILENT_DURATION_MILLISECONDS; // this based on system time
-					alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire, mAlarmIntent);
-				}
-				
-				
-				// ----------------------------------------------------
-
-				final DateFormat dateFormatterUser = DateFormat.getTimeInstance(DateFormat.SHORT);
-				final DateFormat dateFormatterLog = DateFormat.getTimeInstance(DateFormat.LONG);
-				// TimeZone tz = dateFormatter.getTimeZone(); - for testing timezone
-				// String dateStringTest = dateFormatter.format(SystemClock.elapsedRealtime());
-				final String dateStringUser = dateFormatterUser.format(mAlarmExpire);
-				final String dateStringLog = dateFormatterLog.format(mAlarmExpire);
-
-				Log.i(TAG, "MyWidgetProvider::onReceive expireTime=" + dateStringLog);
-				// toast
-				String toastText = context.getString(R.string.toast_ON);
-				toastText = String.format(toastText, dateStringUser);
-				
-				if (mToast!=null){
-					mToast.cancel();
-				}
-				mToast = Toast.makeText(context, toastText, Toast.LENGTH_LONG);
-				mToast.show();
-
-				
-				// Build notification ------------------------------------------------
-				
-				// notification strings
-				final String notiTitle = context.getString(R.string.notification_title);
-				final String notiCancel = context.getString(R.string.notification_ON_cancel);
-				//String notiTickerText = context.getString(R.string.notification_ON_ticker);
-				//notiTickerText = String.format(notiTickerText, dateString);
-				String notiContentText = context.getString(R.string.notification_ON_content);
-				notiContentText = String.format(notiContentText, dateStringUser);
-
-				// Intent 1: When main part of notification is clicked, just return to home screen
-				// Intent 2: When cancel is clicked, remove notification and enable regular notifications
-				
-				// Pending intent to be fired when notification is clicked
-				Intent notiIntent = new Intent(context, MyWidgetProvider.class);
-				notiIntent.setAction(Intent.ACTION_EDIT);
-				PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, notiIntent, 0);
-
-				
-				// Define the Notification's expanded message and Intent:
-				Notification.Builder notificationBuilder = new Notification.Builder(context)
-						//.setTicker(notiTickerText)
-						//.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
-						.setSmallIcon(R.drawable.ic_notify)
-						.setContentTitle(notiTitle)
-						.setContentText(notiContentText)
-						.addAction(android.R.drawable.ic_lock_silent_mode_off, notiCancel, cancelPendingIntent);
-
-				// Pass the Notification to the NotificationManager:
-				NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-				notificationManager.notify(MY_NOTIFICATION_ID, notificationBuilder.build());
-			}
+			Log.i(TAG, "INTENT_ACTION_WIDGET_CLICK - enter");
 			
-		}
-		else if (intent.getAction() == Intent.ACTION_DELETE) {
-			// ACTION_DELETE means timer expired, so slient action should be "deleted"
-			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: START");
-			
-				Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: TIMER EXPIRED");
-				
-				//TODO: Change to Normal Notifications
-				AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-				final int curAudioMode = audioManager.getRingerMode();
-				String curModeString = "UNKNOWN";
-				
-				switch (curAudioMode) {
-				case AudioManager.RINGER_MODE_NORMAL:
-					curModeString = "NORMAL";
-					break;
-				case AudioManager.RINGER_MODE_SILENT:
-					curModeString = "SILENT";
-					break;
-				case AudioManager.RINGER_MODE_VIBRATE:
-					curModeString = "VIBRATE";
-					break;
-				default:
-					break;
-				}
-				Log.i(TAG, String.format("Current Audio Mode = %s", curModeString));
-				
-				if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-					Log.i(TAG, "AudioMode: Set to normal");
-					audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-				}
-				// -------------------------------------------
-				
-				// If the timer expired Build notification ------------------------------------------------
-				final long alarmExpired = System.currentTimeMillis();
-				final DateFormat dateFormatterUser = DateFormat.getTimeInstance(DateFormat.SHORT);
-				final DateFormat dateFormatterLog = DateFormat.getTimeInstance(DateFormat.LONG);
-				String dateStringUser = dateFormatterUser.format(alarmExpired);
-				String dateStringLog = dateFormatterLog.format(alarmExpired);
-				Log.i(TAG, "Actual Expiry Time:" + dateStringLog);
-				
-				final String notiTitle = context.getString(R.string.notification_title);
-//				final String notiCancel = context.getString(R.string.notification_OFF_cancel);
-//				String notiTickerText = context.getString(R.string.notification_OFF_ticker);
-//				notiTickerText = String.format(notiTickerText, dateString);
-				String notiContentText = context.getString(R.string.notification_OFF_timer);
-				notiContentText = String.format(notiContentText, dateStringUser);
-				
-				Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: UPDATE NOTIFICATION");
-				// Define the Notification's expanded message and Intent:
-				Notification.Builder notificationBuilder = new Notification.Builder(context)
-						//.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
-						.setSmallIcon(R.drawable.ic_notify)
-						.setContentTitle(notiTitle)
-						.setContentText(notiContentText);
-
-				// Pass the Notification to the NotificationManager:
-				NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-				mNotificationManager.notify(MY_NOTIFICATION_ID, notificationBuilder.build());
-
-			    mAlarmIntent = null;
-
-				Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_DELETE: FINISH");
-			
-		}
-		else if (intent.getAction() == Intent.ACTION_EDIT) {
-			// ACTION_EDIT means user canceled the mode manually (and "edit")
-			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: START");
-
-			//TODO: Change to Normal Notifications
-			AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+			// ----------------------------------------------------
+			// check current ringermode
+			AudioManager audioManager = (AudioManager) context
+					.getSystemService(Context.AUDIO_SERVICE);
 			final int curAudioMode = audioManager.getRingerMode();
 			String curModeString = "UNKNOWN";
-			
+
 			switch (curAudioMode) {
 			case AudioManager.RINGER_MODE_NORMAL:
 				curModeString = "NORMAL";
@@ -242,63 +73,261 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			default:
 				break;
 			}
-			Log.i(TAG, String.format("Current Audio Mode = %s", curModeString));
-			
-			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-				Log.i(TAG, "AudioMode: Set to normal");
-				audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-			}
-			// -------------------------------------------
-			
 
-			// cancel timer and clear notification
-			Log.i(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL ALARM");
-			AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-			if (alarmMgr!= null && mAlarmIntent != null) {
-			    alarmMgr.cancel(mAlarmIntent);
+			Log.i(TAG, "AudioMode=" + curModeString);
+
+			// --------------------------------------------------
+			// set timer to re-enable original ringer mode
+			AlarmManager alarmMgr = (AlarmManager) context
+					.getSystemService(Context.ALARM_SERVICE);
+
+			if (mAlarmIntent == null) {
+				// Create a NEW timer for Canceling Silent Mode
+				// -----------------------------------------
+				Intent intentAlarmReceiver = new Intent(context,
+						MyWidgetProvider.class);
+				intentAlarmReceiver.setAction(INTENT_ACTION_TIMER_EXPIRED);
+
+				mAlarmIntent = PendingIntent.getBroadcast(context, 0,
+						intentAlarmReceiver, 0);
+
+				mAlarmExpire = System.currentTimeMillis()
+						+ SILENT_DURATION_MILLISECONDS;
+				
+				alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire,
+						mAlarmIntent);
+				
+				Log.i(TAG, "AudioMode=" + curModeString);
+
+			} else {
+				// Update existing timer
+				// ------------------------------------------
+
+				mAlarmExpire = mAlarmExpire + SILENT_DURATION_MILLISECONDS; 
+				alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire,
+						mAlarmIntent);
 			}
 			
-			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: CANCEL NOTIFICATION");
-			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			final DateFormat dateFormatterUser = DateFormat
+					.getTimeInstance(DateFormat.SHORT);
+			final DateFormat dateFormatterLog = DateFormat
+					.getTimeInstance(DateFormat.LONG);
+
+			final String dateStringUser = dateFormatterUser
+					.format(mAlarmExpire);
+			final String dateStringLog = dateFormatterLog.format(mAlarmExpire);
+
+			Log.i(TAG, "onReceive Set expireTime=" + dateStringLog);
+
+			// ----------------------------------------------------
+			// set ringer mode after alarm is set 
+			// to ensure mode will become re-enabled
+			if (curAudioMode != AudioManager.RINGER_MODE_SILENT) {
+				audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+				Log.i(TAG, "AudioMode=RINGER_MODE_SILENT");
+			}
+
+			// ----------------------------------------------------
+			// Create toast to alert user
+
+			String toastText = context.getString(R.string.toast_ON);
+			toastText = String.format(toastText, dateStringUser);
+
+			if (mToast != null) {
+				mToast.cancel();
+			}
+			mToast = Toast.makeText(context, toastText, Toast.LENGTH_LONG);
+			mToast.show();
+
+			// ------------------------------------------------
+			// Build notification
+
+			// notification strings
+			final String notiTitle = context
+					.getString(R.string.notification_title);
+			final String notiCancel = context
+					.getString(R.string.notification_ON_cancel);
+
+			String notiContentText = context
+					.getString(R.string.notification_ON_content);
+			notiContentText = String.format(notiContentText, dateStringUser);
+
+			// Pending intent to be fired when notification is clicked
+			Intent notiIntent = new Intent(context, MyWidgetProvider.class);
+			notiIntent.setAction(INTENT_ACTION_NOTIFICATION_CANCEL_CLICK);
+			PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(
+					context, 0, notiIntent, 0);
+
+			// Define the Notification's expanded message and Intent:
+			Notification.Builder notificationBuilder = new Notification.Builder(
+					context)
+					.setSmallIcon(R.drawable.ic_notify)
+					.setContentTitle(notiTitle)
+					.setContentText(notiContentText)
+					.addAction(android.R.drawable.ic_lock_silent_mode_off,
+							notiCancel, cancelPendingIntent);
+
+			// Pass the Notification to the NotificationManager:
+			NotificationManager notificationManager = (NotificationManager) context
+					.getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.notify(MY_NOTIFICATION_ID,
+					notificationBuilder.build());
+
+			Log.i(TAG, "INTENT_ACTION_WIDGET_CLICK - exit");
+
+		} else if (curIntentAction == INTENT_ACTION_TIMER_EXPIRED) {
+			Log.i(TAG, "INTENT_ACTION_TIMER_EXPIRED - enter");
+
+			// Timer expired - restore previous notification type
+
+			// --------------------------------------------------
+			// enable previous ringerMode
+			AudioManager audioManager = (AudioManager) context
+					.getSystemService(Context.AUDIO_SERVICE);
+			final int curAudioMode = audioManager.getRingerMode();
+			String curModeString = "UNKNOWN";
+
+			switch (curAudioMode) {
+			case AudioManager.RINGER_MODE_NORMAL:
+				curModeString = "NORMAL";
+				break;
+			case AudioManager.RINGER_MODE_SILENT:
+				curModeString = "SILENT";
+				break;
+			case AudioManager.RINGER_MODE_VIBRATE:
+				curModeString = "VIBRATE";
+				break;
+			default:
+				break;
+			}
+			Log.i(TAG, "AudioMode=" + curModeString);
+
+
+			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
+				audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				Log.i(TAG, "AudioMode=RINGER_MODE_NORMAL");
+			}
+
+			// -------------------------------------------
+			// Build notification to say timer expired
+			final long alarmExpired = System.currentTimeMillis();
+			final DateFormat dateFormatterUser = DateFormat
+					.getTimeInstance(DateFormat.SHORT);
+			final DateFormat dateFormatterLog = DateFormat
+					.getTimeInstance(DateFormat.LONG);
+			String dateStringUser = dateFormatterUser.format(alarmExpired);
+			String dateStringLog = dateFormatterLog.format(alarmExpired);
+			Log.i(TAG, "onReceive Actual expireTime:" + dateStringLog);
+
+			final String notiTitle = context
+					.getString(R.string.notification_title);
+
+			String notiContentText = context
+					.getString(R.string.notification_OFF_timer);
+			notiContentText = String.format(notiContentText, dateStringUser);
+
+			// Define the Notification's expanded message and Intent:
+			Notification.Builder notificationBuilder = new Notification.Builder(
+					context)
+					.setSmallIcon(R.drawable.ic_notify)
+					.setContentTitle(notiTitle).setContentText(notiContentText);
+
+			// Pass the Notification to the NotificationManager:
+			NotificationManager mNotificationManager = (NotificationManager) context
+					.getSystemService(Context.NOTIFICATION_SERVICE);
+			mNotificationManager.notify(MY_NOTIFICATION_ID,
+					notificationBuilder.build());
+
+			mAlarmIntent = null;
+			Log.i(TAG, "INTENT_ACTION_TIMER_EXPIRED - exit");
+
+		} else if (intent.getAction() == INTENT_ACTION_NOTIFICATION_CANCEL_CLICK) {
+			Log.i(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - enter");
+
+			// User canceled the mode manually from notifications
+
+			// -----------------------------------------------
+			// Restore previous RingerMode
+			AudioManager audioManager = (AudioManager) context
+					.getSystemService(Context.AUDIO_SERVICE);
+			final int curAudioMode = audioManager.getRingerMode();
+			String curModeString = "UNKNOWN";
+
+			switch (curAudioMode) {
+			case AudioManager.RINGER_MODE_NORMAL:
+				curModeString = "NORMAL";
+				break;
+			case AudioManager.RINGER_MODE_SILENT:
+				curModeString = "SILENT";
+				break;
+			case AudioManager.RINGER_MODE_VIBRATE:
+				curModeString = "VIBRATE";
+				break;
+			default:
+				break;
+			}
+			Log.i(TAG, "AudioMode=" + curModeString);
+
+			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
+				audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				Log.i(TAG, "AudioMode=RINGER_MODE_NORMAL");
+			}
+
+			// -------------------------------------------
+			// cancel timer
+			AlarmManager alarmMgr = (AlarmManager) context
+					.getSystemService(Context.ALARM_SERVICE);
+			if (alarmMgr != null && mAlarmIntent != null) {
+				alarmMgr.cancel(mAlarmIntent);
+			}
+
+			// -------------------------------------------
+			// clear notification
+			NotificationManager notificationManager = (NotificationManager) context
+					.getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.cancel(MY_NOTIFICATION_ID);
 
-		    mAlarmIntent = null;
-			Log.d(TAG, "MyWidgetProvider::onReceive - ACTION_EDIT: FINISH");
+			mAlarmIntent = null;
+			
+			Log.i(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - exit");
 		}
-		else
-		{
-			Log.e(TAG, "MyWidgetProvider::onReceive - unknown trigger");
-		}
-		// AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-		// Toast.makeText(context, "Touched view", Toast.LENGTH_SHORT).show();
 
 		super.onReceive(context, intent);
-		Log.d(TAG, "MyWidgetProvider::onReceive - exit");
+		Log.i(TAG, "MyWidgetProvider::onReceive - exit");
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
 			int[] appWidgetIds) {
 
-		Log.d(TAG, "MyWidgetProvider::onUpdate - enter");
+		Log.i(TAG, "MyWidgetProvider::onUpdate - enter");
 
-		ComponentName thisWidget = new ComponentName(context, MyWidgetProvider.class);
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-		
-		// Register an onClickListener for widget update ----------------------------------------------------
+		ComponentName thisWidget = new ComponentName(context,
+				MyWidgetProvider.class);
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+				R.layout.widget_layout);
+
+		// Register an onClickListener for widget update
+		// ----------------------------------------------------
 		Intent updateIntent = new Intent(context, MyWidgetProvider.class);
-		updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-		// updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-		PendingIntent updatePIntent = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
+		updateIntent.setAction(INTENT_ACTION_WIDGET_CLICK);
+		// updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+		// updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
+		// appWidgetIds);
+		PendingIntent updatePIntent = PendingIntent.getBroadcast(context, 0,
+				updateIntent, 0);
 		remoteViews.setOnClickPendingIntent(R.id.widget_image, updatePIntent);
 		appWidgetManager.updateAppWidget(thisWidget, remoteViews);
+		
+		Log.i(TAG, "MyWidgetProvider::onUpdate - Register Widget Click Intent");
 		// ----------------------------------------------------
 
-		// // Update the widgets via the service ----------------------------------------------------
+		// // Update the widgets via the service
+		// ----------------------------------------------------
 		// context.startService(intent);
 		// ----------------------------------------------------
 
-		Log.d(TAG, "MyWidgetProvider::onUpdate - exit");
+		Log.i(TAG, "MyWidgetProvider::onUpdate - exit");
 
 	}
 
