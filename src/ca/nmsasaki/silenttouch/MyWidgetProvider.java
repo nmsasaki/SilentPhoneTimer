@@ -15,7 +15,6 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.text.DateFormat;
 
 public class MyWidgetProvider extends AppWidgetProvider {
