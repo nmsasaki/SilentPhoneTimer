@@ -63,6 +63,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			AudioManager audioManager = (AudioManager) context
 					.getSystemService(Context.AUDIO_SERVICE);
 			final int curAudioMode = audioManager.getRingerMode();
+			
+			// TODO: Extract RINGERMODE string to function
 			String curModeString = "UNKNOWN";
 
 			switch (curAudioMode) {
@@ -86,6 +88,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			AlarmManager alarmMgr = (AlarmManager) context
 					.getSystemService(Context.ALARM_SERVICE);
 
+			// TODO: move calendar getInstance and refactor code to extract truncate seconds 
+			// into separate function that takes start time as a function 
 			Calendar calendar = Calendar.getInstance();
 			
 			if (mAlarmIntent == null) {
@@ -124,6 +128,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 						mAlarmIntent);
 			}
 			
+			
+			// TODO: Extract Dateformatting to function
 			final DateFormat dateFormatterUser = DateFormat
 					.getTimeInstance(DateFormat.SHORT);
 			final DateFormat dateFormatterLog = DateFormat
@@ -201,8 +207,9 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			AudioManager audioManager = (AudioManager) context
 					.getSystemService(Context.AUDIO_SERVICE);
 			final int curAudioMode = audioManager.getRingerMode();
-			String curModeString = "UNKNOWN";
 
+			// TODO: Extract RINGERMODE string to function
+			String curModeString = "UNKNOWN";
 			switch (curAudioMode) {
 			case AudioManager.RINGER_MODE_NORMAL:
 				curModeString = "NORMAL";
@@ -227,6 +234,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			// -------------------------------------------
 			// Build notification to say timer expired
 			final long alarmExpired = System.currentTimeMillis();
+			
+			// TODO: Extract Dateformatting to function
 			final DateFormat dateFormatterUser = DateFormat
 					.getTimeInstance(DateFormat.SHORT);
 			final DateFormat dateFormatterLog = DateFormat
