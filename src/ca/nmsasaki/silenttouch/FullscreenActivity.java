@@ -1,8 +1,7 @@
 package ca.nmsasaki.silenttouch;
 
-import ca.nmsasaki.silentphonetimer.R;
-import ca.nmsasaki.silenttouch.util.SystemUiHider;
 
+import ca.nmsasaki.silenttouch.util.SystemUiHider;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
@@ -24,11 +23,6 @@ public class FullscreenActivity extends Activity {
 
 	private static final String TAG = "SilentTouch";
 
-	//private final RemoteViews mNotificationView = new RemoteViews("ca.nmsasaki.silentphonetimer", R.layout.notification_layout);
-
-	// Notification ID to allow for future updates
-	// private static final int MY_NOTIFICATION_ID = 1;
-	
 	private Button mDummyButton = null;
 	/**
 	 * Whether or not the system UI should be auto-hidden after

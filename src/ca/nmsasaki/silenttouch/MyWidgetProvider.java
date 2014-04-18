@@ -15,8 +15,6 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 import java.text.DateFormat;
 
-import ca.nmsasaki.silentphonetimer.R;
-
 public class MyWidgetProvider extends AppWidgetProvider {
 
 	private static final long SILENT_DURATION_MILLISECONDS = 1 * 60 * 1000;
