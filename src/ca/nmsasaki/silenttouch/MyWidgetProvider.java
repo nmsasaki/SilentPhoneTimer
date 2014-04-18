@@ -13,11 +13,16 @@ import android.media.AudioManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.text.DateFormat;
 
 public class MyWidgetProvider extends AppWidgetProvider {
 
-	private static final long SILENT_DURATION_MILLISECONDS = 1 * 60 * 1000;
+	// when testing minimum is 2 minutes because I round seconds down to 00 to timer expires on minute change
+	//private static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
+	private static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
 	private static final String TAG = "SilentTouch";
 	private static final int MY_NOTIFICATION_ID = 1;
 
@@ -81,6 +86,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			AlarmManager alarmMgr = (AlarmManager) context
 					.getSystemService(Context.ALARM_SERVICE);
 
+			Calendar calendar = Calendar.getInstance();
+			
 			if (mAlarmIntent == null) {
 				// Create a NEW timer for Canceling Silent Mode
 				// -----------------------------------------
@@ -93,6 +100,10 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 				mAlarmExpire = System.currentTimeMillis()
 						+ SILENT_DURATION_MILLISECONDS;
+				// truncate seconds
+				calendar.setTimeInMillis(mAlarmExpire);
+				calendar.set(Calendar.SECOND,0);
+				mAlarmExpire = calendar.getTimeInMillis();
 				
 				alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire,
 						mAlarmIntent);
@@ -103,7 +114,12 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				// Update existing timer
 				// ------------------------------------------
 
-				mAlarmExpire = mAlarmExpire + SILENT_DURATION_MILLISECONDS; 
+				mAlarmExpire = mAlarmExpire + SILENT_DURATION_MILLISECONDS;
+				// truncate seconds
+				calendar.setTimeInMillis(mAlarmExpire);
+				calendar.set(Calendar.SECOND,0);
+				mAlarmExpire = calendar.getTimeInMillis();
+				
 				alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire,
 						mAlarmIntent);
 			}
