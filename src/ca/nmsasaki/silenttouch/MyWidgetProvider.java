@@ -32,6 +32,9 @@ public class MyWidgetProvider extends AppWidgetProvider {
 	// mToast is used to cancel an existing toast if user clicks on widget in succession
 	// should be ok if this state gets cleaned up by android
 	private static Toast mToast = null;
+	
+	// TODO: remove dependence on this variable used for storing original alarm state
+	private static int mRingerMode = AudioManager.RINGER_MODE_NORMAL;
 	// TODO: remove dependence on this variable used for updating an existing alarm
 	private static long mAlarmExpire = 0;
 	// TODO: remove dependence on this variable used for updating exiting timer
@@ -70,14 +73,14 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			String curModeString = "UNKNOWN";
 
 			switch (curAudioMode) {
-			case AudioManager.RINGER_MODE_NORMAL:
-				curModeString = "NORMAL";
-				break;
 			case AudioManager.RINGER_MODE_SILENT:
-				curModeString = "SILENT";
+				curModeString = "0-RINGER_MODE_SILENT";
 				break;
 			case AudioManager.RINGER_MODE_VIBRATE:
-				curModeString = "VIBRATE";
+				curModeString = "1-RINGER_MODE_VIBRATE";
+				break;
+			case AudioManager.RINGER_MODE_NORMAL:
+				curModeString = "2-RINGER_MODE_NORMAL";
 				break;
 			default:
 				break;
@@ -114,11 +117,18 @@ public class MyWidgetProvider extends AppWidgetProvider {
 				alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire,
 						mAlarmIntent);
 				
-				Log.i(TAG, "AudioMode=" + curModeString);
-
+				// set ringer mode to restore here
+				// do NOT set it when timer is being updated (it would already be silent)
+				// if the ringer mode is silent already, then set restore mode to normal
+				mRingerMode = curAudioMode;
+				if (curAudioMode == AudioManager.RINGER_MODE_SILENT){
+					mRingerMode = AudioManager.RINGER_MODE_NORMAL;
+				}
+				
 			} else {
 				// Update existing timer
 				// ------------------------------------------
+				
 
 				mAlarmExpire = mAlarmExpire + SILENT_DURATION_MILLISECONDS;
 				// truncate seconds
@@ -182,14 +192,20 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(
 					context, 0, notiIntent, 0);
 
+			// cannot find official vibrate icon
+			int iconId = android.R.drawable.ic_lock_silent_mode_off;
+//			if (mRingerMode == AudioManager.RINGER_MODE_VIBRATE) {
+//				iconId = android.R.drawable.;
+//			}
+
+			
 			// Define the Notification's expanded message and Intent:
 			Notification.Builder notificationBuilder = new Notification.Builder(
 					context)
 					.setSmallIcon(R.drawable.ic_notify)
 					.setContentTitle(notiTitle)
 					.setContentText(notiContentText)
-					.addAction(android.R.drawable.ic_lock_silent_mode_off,
-							notiCancel, cancelPendingIntent);
+					.addAction(iconId, notiCancel, cancelPendingIntent);
 
 			// Pass the Notification to the NotificationManager:
 			NotificationManager notificationManager = (NotificationManager) context
@@ -213,14 +229,14 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			// TODO: Extract RINGERMODE string to function
 			String curModeString = "UNKNOWN";
 			switch (curAudioMode) {
-			case AudioManager.RINGER_MODE_NORMAL:
-				curModeString = "NORMAL";
-				break;
 			case AudioManager.RINGER_MODE_SILENT:
-				curModeString = "SILENT";
+				curModeString = "0-RINGER_MODE_SILENT";
 				break;
 			case AudioManager.RINGER_MODE_VIBRATE:
-				curModeString = "VIBRATE";
+				curModeString = "1-RINGER_MODE_VIBRATE";
+				break;
+			case AudioManager.RINGER_MODE_NORMAL:
+				curModeString = "2-RINGER_MODE_NORMAL";
 				break;
 			default:
 				break;
@@ -229,8 +245,9 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 
 			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-				audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-				Log.i(TAG, "AudioMode=RINGER_MODE_NORMAL");
+				Log.i(TAG, String.format("before AudioMode=%d", mRingerMode));
+				audioManager.setRingerMode(mRingerMode);
+				Log.i(TAG, String.format("after AudioMode=%d", mRingerMode));
 			}
 
 			// -------------------------------------------
@@ -275,20 +292,21 @@ public class MyWidgetProvider extends AppWidgetProvider {
 
 			// -----------------------------------------------
 			// Restore previous RingerMode
+			// TODO: Extract RINGERMODE
 			AudioManager audioManager = (AudioManager) context
 					.getSystemService(Context.AUDIO_SERVICE);
 			final int curAudioMode = audioManager.getRingerMode();
 			String curModeString = "UNKNOWN";
 
 			switch (curAudioMode) {
-			case AudioManager.RINGER_MODE_NORMAL:
-				curModeString = "NORMAL";
-				break;
 			case AudioManager.RINGER_MODE_SILENT:
-				curModeString = "SILENT";
+				curModeString = "0-RINGER_MODE_SILENT";
 				break;
 			case AudioManager.RINGER_MODE_VIBRATE:
-				curModeString = "VIBRATE";
+				curModeString = "1-RINGER_MODE_VIBRATE";
+				break;
+			case AudioManager.RINGER_MODE_NORMAL:
+				curModeString = "2-RINGER_MODE_NORMAL";
 				break;
 			default:
 				break;
@@ -296,8 +314,8 @@ public class MyWidgetProvider extends AppWidgetProvider {
 			Log.i(TAG, "AudioMode=" + curModeString);
 
 			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-				audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-				Log.i(TAG, "AudioMode=RINGER_MODE_NORMAL");
+				audioManager.setRingerMode(mRingerMode);
+				Log.i(TAG, String.format("AudioMode=%d",mRingerMode));
 			}
 
 			// -------------------------------------------
