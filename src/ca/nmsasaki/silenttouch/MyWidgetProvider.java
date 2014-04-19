@@ -20,8 +20,8 @@ import java.text.DateFormat;
 public class MyWidgetProvider extends AppWidgetProvider {
 
 	// when testing minimum is 2 minutes because I round seconds down to 00 to timer expires on minute change
-	//private static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
-	private static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
+	private static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
+	//private static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
 	private static final String TAG = "SilentTouch";
 	private static final int MY_NOTIFICATION_ID = 1;
 

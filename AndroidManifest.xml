@@ -16,7 +16,7 @@
         <activity
             android:name="ca.nmsasaki.silenttouch.FullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_diplay_name"
+            android:label="@string/app_display_name"
             android:theme="@style/FullscreenTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,7 +47,7 @@
         <receiver
             android:name="ca.nmsasaki.silenttouch.MyWidgetProvider"
             android:icon="@drawable/ic_launchf"
-            android:label="@string/widget_test_name" >
+            android:label="@string/app_display_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

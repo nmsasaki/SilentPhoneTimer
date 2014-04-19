@@ -19,7 +19,7 @@ public class ShortcutActivity extends Activity {
 	    Intent shortcutActivity = new Intent(this, FullscreenActivity.class);
 
 	    i.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutActivity);
-	    i.putExtra(Intent.EXTRA_SHORTCUT_NAME, R.string.app_diplay_name);
+	    i.putExtra(Intent.EXTRA_SHORTCUT_NAME, R.string.app_display_name);
 	    i.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launchf));
 	    
 	    setResult(RESULT_OK, i);

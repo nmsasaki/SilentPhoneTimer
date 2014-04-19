@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">SilentTouch</string>
-    <string name="app_diplay_name">Silent Touch</string>
+    <string name="app_display_name">Silent Touch</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="widget_test_name">0 - Silent Touch</string>
