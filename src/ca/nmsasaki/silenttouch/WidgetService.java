@@ -1,6 +1,5 @@
 package ca.nmsasaki.silenttouch;
 
-//import android.app.PendingIntent;
 import java.text.DateFormat;
 import java.util.Calendar;
 
@@ -10,8 +9,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
-//import android.appwidget.AppWidgetManager;
-//import android.content.ComponentName;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.IBinder;
@@ -46,8 +43,6 @@ public class WidgetService extends Service {
 	public void onStart(Intent intent, int startId) {
 		Log.i(TAG, "WidgetService::onStart - enter");
 
-		// Toast.makeText(getApplicationContext(),
-		// "Button is clicked", Toast.LENGTH_LONG).show();
 		Context context = getApplicationContext();
 
 		final String curIntentAction = intent.getAction();
@@ -59,60 +54,6 @@ public class WidgetService extends Service {
 		} else if (intent.getAction() == INTENT_ACTION_NOTIFICATION_CANCEL_CLICK) {
 			UserClickedCancel(context);
 		}
-
-		// AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this
-		// .getApplicationContext());
-
-		// int[] allWidgetIds = intent
-		// .getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
-
-		// ComponentName thisWidget = new ComponentName(getApplicationContext(),
-		// MyWidgetProvider.class);
-
-		// int[] allWidgetIds2 = appWidgetManager.getAppWidgetIds(thisWidget);
-		// Log.w(LOG, "From Intent" + String.valueOf(allWidgetIds.length));
-		// Log.w(LOG, "Direct" + String.valueOf(allWidgetIds2.length));
-
-		// for (int widgetId : allWidgetIds) {
-		// // create some random data
-		// int number = (new Random().nextInt(100));
-		//
-		// RemoteViews remoteViews = new RemoteViews(this
-		// .getApplicationContext().getPackageName(),
-		// R.layout.widget_layout);
-		// Log.w("WidgetExample", String.valueOf(number));
-		//
-		// // Set the text
-		// remoteViews.setTextViewText(R.id.update,
-		// "Random: " + String.valueOf(number));
-		//
-		// // Register an onClickListener
-		// Intent clickIntent = new Intent(this.getApplicationContext(),
-		// MyWidgetProvider.class);
-		//
-		// clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-		// clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
-		// allWidgetIds);
-		//
-		// PendingIntent pendingIntent =
-		// PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
-		// PendingIntent.FLAG_UPDATE_CURRENT);
-		// remoteViews.setOnClickPendingIntent(R.id.update, pendingIntent);
-		// appWidgetManager.updateAppWidget(widgetId, remoteViews);
-		// }
-
-		// Register an onClickListener
-		// Intent clickIntent = new Intent(this.getApplicationContext(),
-		// MyWidgetProvider.class);
-		//
-		// clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-		//
-		// PendingIntent pendingIntent =
-		// PendingIntent.getBroadcast(getApplicationContext(), 0, clickIntent,
-		// PendingIntent.FLAG_UPDATE_CURRENT);
-
-		// remoteViews.setOnClickPendingIntent(R.id.update, pendingIntent);
-		// appWidgetManager.updateAppWidget(widgetId, remoteViews);
 
 		Log.i(TAG, "WidgetService::onStart - exit");
 		stopSelf();
