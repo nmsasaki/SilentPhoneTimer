@@ -17,28 +17,32 @@ import android.widget.Toast;
 
 public class WidgetService extends Service {
 
-	// when testing minimum is 2 minutes because I round seconds down to 00 to timer expires on minute change
-	//private static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
+	// when testing minimum is 2 minutes because I round seconds down to 00 to
+	// timer expires on minute change
+	// private static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
 	private static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
 	private static final String TAG = "SilentTouch";
 	private static final int MY_NOTIFICATION_ID = 1;
 
-//	private static final String INTENT_ACTION_WIDGET_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_WIDGET_CLICK";
+	// private static final String INTENT_ACTION_WIDGET_CLICK =
+	// "ca.nmsasaki.silenttouch.INTENT_ACTION_WIDGET_CLICK";
 	private static final String INTENT_ACTION_NOTIFICATION_CANCEL_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_NOTIFICATION_CANCEL_CLICK";
 	private static final String INTENT_ACTION_TIMER_EXPIRED = "ca.nmsasaki.silenttouch.INTENT_ACTION_TIMER_EXPIRED";
 
-	// mToast is used to cancel an existing toast if user clicks on widget in succession
+	// mToast is used to cancel an existing toast if user clicks on widget in
+	// succession
 	// should be ok if this state gets cleaned up by android
 	private static Toast mToast = null;
-	
-	// TODO: remove dependence on this variable used for storing original alarm state
-	private static int mRingerMode = AudioManager.RINGER_MODE_NORMAL;
-	// TODO: remove dependence on this variable used for updating an existing alarm
-	private static long mAlarmExpire = 0;
-	// TODO: remove dependence on this variable used for updating exiting timer
-	private static PendingIntent mAlarmIntent = null;
 
+	// TODO: remove dependence on this variable used for storing original alarm
+	// state
+	private static int mOriginalRingerMode = AudioManager.RINGER_MODE_NORMAL;
 	
+	// TODO: remove dependence on this variable used for updating an existing
+	// If mAlarm = 0, there is no timer set
+	// need to set this to 0 after timer expires or user clicks to cancel
+	private static long mAlarmExpireTime = 0;
+
 	@Override
 	public void onStart(Intent intent, int startId) {
 		Log.i(TAG, "WidgetService::onStart - enter");
@@ -82,35 +86,32 @@ public class WidgetService extends Service {
 
 		// -----------------------------------------------
 		// Restore previous RingerMode
-		AudioManager audioMgr = (AudioManager) context
-				.getSystemService(Context.AUDIO_SERVICE);
+		AudioManager audioMgr = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		final int curAudioMode = audioMgr.getRingerMode();
 
 		final String curModeString = RingerMode_intToString(curAudioMode);
 		Log.i(TAG, "AudioMode=" + curModeString);
 
 		if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-			audioMgr.setRingerMode(mRingerMode);
-			Log.i(TAG, String.format("AudioMode=%d", mRingerMode));
+			audioMgr.setRingerMode(mOriginalRingerMode);
+			Log.i(TAG, String.format("AudioMode=%d", mOriginalRingerMode));
 		}
 
 		// -------------------------------------------
 		// cancel timer
-		AlarmManager alarmMgr = (AlarmManager) context
-				.getSystemService(Context.ALARM_SERVICE);
+		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-		// TODO: Should be able to handle null intent here by building one
-		if (mAlarmIntent != null) {
-			alarmMgr.cancel(mAlarmIntent);
-		}
+		PendingIntent alarmIntent = createAlarmIntent(context);
+		alarmMgr.cancel(alarmIntent);
 
 		// -------------------------------------------
 		// clear notification
-		NotificationManager notiMgr = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager notiMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notiMgr.cancel(MY_NOTIFICATION_ID);
-		mAlarmIntent = null;
 
+		// set AlarmExpire to 0 to show that there is no more timer
+		mAlarmExpireTime = 0;
+		
 		Log.i(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - exit");
 
 	}
@@ -127,31 +128,27 @@ public class WidgetService extends Service {
 
 		// --------------------------------------------------
 		// enable previous ringerMode
-		AudioManager audioMgr = (AudioManager) context
-				.getSystemService(Context.AUDIO_SERVICE);
+		AudioManager audioMgr = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		final int curAudioMode = audioMgr.getRingerMode();
 		final String curModeString = RingerMode_intToString(curAudioMode);
 
 		Log.i(TAG, "AudioMode=" + curModeString);
 
 		if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-			Log.i(TAG, String.format("before AudioMode=%d", mRingerMode));
-			audioMgr.setRingerMode(mRingerMode);
-			Log.i(TAG, String.format("after AudioMode=%d", mRingerMode));
+			Log.i(TAG, String.format("before AudioMode=%d", mOriginalRingerMode));
+			audioMgr.setRingerMode(mOriginalRingerMode);
+			Log.i(TAG, String.format("after AudioMode=%d", mOriginalRingerMode));
 		}
 
 		// -------------------------------------------
 		// Build notification to say timer expired
 		final long alarmExpired = System.currentTimeMillis();
-		final String dateStringLog = DateFormat
-				.getTimeInstance(DateFormat.LONG).format(alarmExpired);
+		final String dateStringLog = DateFormat.getTimeInstance(DateFormat.LONG).format(alarmExpired);
 		Log.i(TAG, "onReceive Actual expireTime:" + dateStringLog);
 
 		final String notiTitle = context.getString(R.string.notification_title);
-		String notiContentText = context
-				.getString(R.string.notification_OFF_timer);
-		final String dateStringUser = DateFormat.getTimeInstance(
-				DateFormat.SHORT).format(alarmExpired);
+		String notiContentText = context.getString(R.string.notification_OFF_timer);
+		final String dateStringUser = DateFormat.getTimeInstance(DateFormat.SHORT).format(alarmExpired);
 		notiContentText = String.format(notiContentText, dateStringUser);
 
 		// Define the Notification's expanded message and Intent:
@@ -160,18 +157,22 @@ public class WidgetService extends Service {
 				.setContentText(notiContentText);
 
 		// Pass the Notification to the NotificationManager:
-		NotificationManager notiMgr = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager notiMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notiMgr.notify(MY_NOTIFICATION_ID, notiBuilder.build());
-
-		mAlarmIntent = null;
+		
+		// set AlarmExpire to 0 to show that there is no more timer
+		mAlarmExpireTime = 0;
+		
 		Log.i(TAG, "INTENT_ACTION_TIMER_EXPIRED - exit");
 
 	}
 
 	/* ***********************************************
-	 * 1. Set New Timer or Update Timer 2. Set RingerMode 3. Create Toast 4.
-	 * Build Notification************************************************
+	 * 1. Set New Timer or Update Timer 
+	 * 2. Set RingerMode 
+	 * 3. Create Toast 
+	 * 4. Build Notification
+	 * ************************************************
 	 */
 	private void UserClickedWidget(Context context) {
 		// User clicked on widget
@@ -182,54 +183,39 @@ public class WidgetService extends Service {
 
 		// ----------------------------------------------------
 		// check current ringermode
-		AudioManager audioMgr = (AudioManager) context
-				.getSystemService(Context.AUDIO_SERVICE);
+		AudioManager audioMgr = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		final int curAudioMode = audioMgr.getRingerMode();
 		final String curModeString = RingerMode_intToString(curAudioMode);
-
 		Log.i(TAG, "AudioMode=" + curModeString);
 
 		// --------------------------------------------------
 		// set timer to re-enable original ringer mode
-		AlarmManager alarmMgr = (AlarmManager) context
-				.getSystemService(Context.ALARM_SERVICE);
+		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-		if (mAlarmIntent == null) {
-			// Create a NEW timer for Canceling Silent Mode
-			// -----------------------------------------
-			Intent intentAlarmReceiver = new Intent(context,
-					WidgetProvider.class);
-			intentAlarmReceiver.setAction(INTENT_ACTION_TIMER_EXPIRED);
-			mAlarmIntent = PendingIntent.getBroadcast(context, 0,
-					intentAlarmReceiver, 0);
-
-			mAlarmExpire = System.currentTimeMillis()
-					+ SILENT_DURATION_MILLISECONDS;
-			mAlarmExpire = truncateSeconds(mAlarmExpire);
-
-			alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire, mAlarmIntent);
+		if (mAlarmExpireTime == 0) {
+			// record current state
+			// set time for silence to expire
+			mAlarmExpireTime = System.currentTimeMillis() + SILENT_DURATION_MILLISECONDS;
 
 			// set ringer mode to restore here
-			// do NOT set it when timer is being updated (it would already be
-			// silent)
-			// if the ringer mode is silent already, then set restore mode to
-			// normal
-			mRingerMode = curAudioMode;
+			// if the ringer mode is silent already, then set restore mode to normal
+			//     (otherwise, why did they click on widget... assume they want it to expire)
 			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-				mRingerMode = AudioManager.RINGER_MODE_NORMAL;
+				mOriginalRingerMode = AudioManager.RINGER_MODE_NORMAL;
+			} else {
+				mOriginalRingerMode = curAudioMode;
 			}
 
 		} else {
-			// Update existing timer
-			// ------------------------------------------
-
-			mAlarmExpire = mAlarmExpire + SILENT_DURATION_MILLISECONDS;
-			mAlarmExpire = truncateSeconds(mAlarmExpire);
-			alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpire, mAlarmIntent);
+			// set time for silence to expire based on previous value
+			mAlarmExpireTime = mAlarmExpireTime + SILENT_DURATION_MILLISECONDS;
 		}
+		
+		PendingIntent alarmIntent = createAlarmIntent(context);
+		mAlarmExpireTime = truncateSeconds(mAlarmExpireTime);
+		alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpireTime, alarmIntent);
 
-		final String dateStringLog = DateFormat
-				.getTimeInstance(DateFormat.LONG).format(mAlarmExpire);
+		final String dateStringLog = DateFormat.getTimeInstance(DateFormat.LONG).format(mAlarmExpireTime);
 		Log.i(TAG, "onReceive Set expireTime=" + dateStringLog);
 
 		// ----------------------------------------------------
@@ -243,8 +229,8 @@ public class WidgetService extends Service {
 		// ----------------------------------------------------
 		// Create toast to alert user
 		String toastText = context.getString(R.string.toast_ON);
-		final String dateStringUser = DateFormat.getTimeInstance(
-				DateFormat.SHORT).format(mAlarmExpire);
+		final String dateStringUser = DateFormat.getTimeInstance(DateFormat.SHORT).format(
+				mAlarmExpireTime);
 		toastText = String.format(toastText, dateStringUser);
 
 		if (mToast != null) {
@@ -258,18 +244,15 @@ public class WidgetService extends Service {
 
 		// notification strings
 		final String notiTitle = context.getString(R.string.notification_title);
-		final String notiCancel = context
-				.getString(R.string.notification_ON_cancel);
+		final String notiCancel = context.getString(R.string.notification_ON_cancel);
 
-		String notiContentText = context
-				.getString(R.string.notification_ON_content);
+		String notiContentText = context.getString(R.string.notification_ON_content);
 		notiContentText = String.format(notiContentText, dateStringUser);
 
 		// Pending intent to be fired when notification is clicked
 		Intent notiIntent = new Intent(context, WidgetProvider.class);
 		notiIntent.setAction(INTENT_ACTION_NOTIFICATION_CANCEL_CLICK);
-		PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context,
-				0, notiIntent, 0);
+		PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, notiIntent, 0);
 
 		// TODO: find actual vibrate icon - cannot find official vibrate icon
 		// use regular notification icon
@@ -281,8 +264,7 @@ public class WidgetService extends Service {
 		// Define the Notification's expanded message and Intent:
 		Notification.Builder notiBuilder = new Notification.Builder(context)
 				.setSmallIcon(R.drawable.ic_notify).setContentTitle(notiTitle)
-				.setContentText(notiContentText)
-				.addAction(iconId, notiCancel, cancelPendingIntent);
+				.setContentText(notiContentText).addAction(iconId, notiCancel, cancelPendingIntent);
 
 		// Pass the Notification to the NotificationManager:
 		NotificationManager notMgr = (NotificationManager) context
@@ -291,6 +273,14 @@ public class WidgetService extends Service {
 
 		Log.i(TAG, "INTENT_ACTION_WIDGET_CLICK - exit");
 
+	}
+
+	
+	private PendingIntent createAlarmIntent(Context context) {
+		Intent intentAlarmReceiver = new Intent(context, WidgetProvider.class);
+		intentAlarmReceiver.setAction(INTENT_ACTION_TIMER_EXPIRED);
+
+		return PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
 	}
 
 	// ********************************
