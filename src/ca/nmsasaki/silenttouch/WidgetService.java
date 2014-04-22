@@ -10,6 +10,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.util.Log;
@@ -19,37 +21,37 @@ public class WidgetService extends Service {
 
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
 	// timer expires on minute change
-	// private static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
-	private static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
+	//private static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
+	public static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
 	private static final String TAG = "SilentTouch";
 	private static final int MY_NOTIFICATION_ID = 1;
 
-	// private static final String INTENT_ACTION_WIDGET_CLICK =
-	// "ca.nmsasaki.silenttouch.INTENT_ACTION_WIDGET_CLICK";
+	// private static final String INTENT_ACTION_WIDGET_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_WIDGET_CLICK";
+	private static final String PREF_NAME = "ca.nmsasaki.silenttouch.prefs";
+	private static final String PREF_NAME_ALARM_EXPIRE = "ca.nmsasaki.silenttouch.prefs.alarm_expire";
+	private static final String PREF_NAME_ORIGINAL_RINGER_MODE = "ca.nmsasaki.silenttouch.prefs.orig_ringer_mode";
 	private static final String INTENT_ACTION_NOTIFICATION_CANCEL_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_NOTIFICATION_CANCEL_CLICK";
 	private static final String INTENT_ACTION_TIMER_EXPIRED = "ca.nmsasaki.silenttouch.INTENT_ACTION_TIMER_EXPIRED";
 
-	// mToast is used to cancel an existing toast if user clicks on widget in
-	// succession
-	// should be ok if this state gets cleaned up by android
+	// TODO: remove static mToast
+	// mToast is used to cancel an existing toast if user clicks on widget in succession
+	// seems to work find and should be ok if this state gets cleaned up by android
 	private static Toast mToast = null;
 
-	// TODO: remove dependence on this variable used for storing original alarm
-	// state
-	private static int mOriginalRingerMode = AudioManager.RINGER_MODE_NORMAL;
 	
-	// TODO: remove dependence on this variable used for updating an existing
-	// If mAlarm = 0, there is no timer set
-	// need to set this to 0 after timer expires or user clicks to cancel
-	private static long mAlarmExpireTime = 0;
+	private int mOriginalRingerMode = AudioManager.RINGER_MODE_NORMAL;
+	private long mAlarmExpireTime = 0;
+	private boolean mPrefsUpdated = false;
+
 
 	@Override
 	public void onStart(Intent intent, int startId) {
 		Log.i(TAG, "WidgetService::onStart - enter");
 
-		Context context = getApplicationContext();
-
 		final String curIntentAction = intent.getAction();
+		final Context context = getApplicationContext();
+		
+		SharedPreferences prefs = readPrefs(context);
 
 		if (curIntentAction == WidgetProvider.INTENT_ACTION_WIDGET_CLICK) {
 			UserClickedWidget(context);
@@ -58,10 +60,37 @@ public class WidgetService extends Service {
 		} else if (intent.getAction() == INTENT_ACTION_NOTIFICATION_CANCEL_CLICK) {
 			UserClickedCancel(context);
 		}
-
+		
+		writePrefs(prefs);
+		
 		Log.i(TAG, "WidgetService::onStart - exit");
 		stopSelf();
 
+	}
+
+	/**
+	 * @param prefs
+	 * 
+	 * if preferences were updated, then write to storage 
+	 */
+	private void writePrefs(SharedPreferences prefs) {
+		if (isPrefsUpdated()) {
+			Editor editor = prefs.edit();
+			editor.putInt(PREF_NAME_ORIGINAL_RINGER_MODE, getOriginalRingerMode());
+			editor.putLong(PREF_NAME_ALARM_EXPIRE, getAlarmExpireTime());
+			editor.commit();
+		}
+	}
+
+	/**
+	 * @param context
+	 * @return SharedPreferences populated with app state
+	 */
+	private SharedPreferences readPrefs(final Context context) {
+		SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+		setOriginalRingerMode(prefs.getInt(PREF_NAME_ORIGINAL_RINGER_MODE, AudioManager.RINGER_MODE_NORMAL));
+		setAlarmExpireTime(prefs.getLong(PREF_NAME_ALARM_EXPIRE, 0));
+		return prefs;
 	}
 
 	@Override
@@ -75,9 +104,13 @@ public class WidgetService extends Service {
 		Log.i(TAG, "WidgetService::onDestroy - exit");
 	}
 
-	/* ***********************************************
-	 * 1. Restore Ringer Mode 2. Cancel Timer 3. Clear Notification
-	 * ************************************************
+	/**
+	 * @param context
+	 * @return
+	 * 
+	 * 1. Restore Ringer Mode 
+	 * 2. Cancel Timer 
+	 * 3. Clear Notification
 	 */
 	private void UserClickedCancel(Context context) {
 		Log.i(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - enter");
@@ -93,8 +126,8 @@ public class WidgetService extends Service {
 		Log.i(TAG, "AudioMode=" + curModeString);
 
 		if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-			audioMgr.setRingerMode(mOriginalRingerMode);
-			Log.i(TAG, String.format("AudioMode=%d", mOriginalRingerMode));
+			audioMgr.setRingerMode(getOriginalRingerMode());
+			Log.i(TAG, String.format("AudioMode=%d", getOriginalRingerMode()));
 		}
 
 		// -------------------------------------------
@@ -110,15 +143,17 @@ public class WidgetService extends Service {
 		notiMgr.cancel(MY_NOTIFICATION_ID);
 
 		// set AlarmExpire to 0 to show that there is no more timer
-		mAlarmExpireTime = 0;
+		setAlarmExpireTime(0);
 		
 		Log.i(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - exit");
 
 	}
 
-	/* ***********************************************
-	 * 1. Restore Ringer Mode 2. Build Notification
-	 * ************************************************
+	/**
+	 * @param context
+	 * @return
+	 * 1. Restore Ringer Mode 
+	 * 2. Build Notification
 	 */
 	private void TimerExpired(Context context) {
 
@@ -135,9 +170,9 @@ public class WidgetService extends Service {
 		Log.i(TAG, "AudioMode=" + curModeString);
 
 		if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-			Log.i(TAG, String.format("before AudioMode=%d", mOriginalRingerMode));
-			audioMgr.setRingerMode(mOriginalRingerMode);
-			Log.i(TAG, String.format("after AudioMode=%d", mOriginalRingerMode));
+			Log.i(TAG, String.format("before AudioMode=%d", getOriginalRingerMode()));
+			audioMgr.setRingerMode(getOriginalRingerMode());
+			Log.i(TAG, String.format("after AudioMode=%d", getOriginalRingerMode()));
 		}
 
 		// -------------------------------------------
@@ -161,18 +196,20 @@ public class WidgetService extends Service {
 		notiMgr.notify(MY_NOTIFICATION_ID, notiBuilder.build());
 		
 		// set AlarmExpire to 0 to show that there is no more timer
-		mAlarmExpireTime = 0;
+		setAlarmExpireTime(0);
 		
 		Log.i(TAG, "INTENT_ACTION_TIMER_EXPIRED - exit");
 
 	}
 
-	/* ***********************************************
+	/**
+	 * @param context
+	 * @return
+	 * 
 	 * 1. Set New Timer or Update Timer 
 	 * 2. Set RingerMode 
 	 * 3. Create Toast 
 	 * 4. Build Notification
-	 * ************************************************
 	 */
 	private void UserClickedWidget(Context context) {
 		// User clicked on widget
@@ -192,30 +229,30 @@ public class WidgetService extends Service {
 		// set timer to re-enable original ringer mode
 		AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-		if (mAlarmExpireTime == 0) {
+		if (getAlarmExpireTime() == 0) {
 			// record current state
 			// set time for silence to expire
-			mAlarmExpireTime = System.currentTimeMillis() + SILENT_DURATION_MILLISECONDS;
+			setAlarmExpireTime(System.currentTimeMillis() + SILENT_DURATION_MILLISECONDS);
 
 			// set ringer mode to restore here
 			// if the ringer mode is silent already, then set restore mode to normal
 			//     (otherwise, why did they click on widget... assume they want it to expire)
 			if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-				mOriginalRingerMode = AudioManager.RINGER_MODE_NORMAL;
+				setOriginalRingerMode(AudioManager.RINGER_MODE_NORMAL);
 			} else {
-				mOriginalRingerMode = curAudioMode;
+				setOriginalRingerMode(curAudioMode);
 			}
 
 		} else {
 			// set time for silence to expire based on previous value
-			mAlarmExpireTime = mAlarmExpireTime + SILENT_DURATION_MILLISECONDS;
+			setAlarmExpireTime(getAlarmExpireTime() + SILENT_DURATION_MILLISECONDS);
 		}
 		
 		PendingIntent alarmIntent = createAlarmIntent(context);
-		mAlarmExpireTime = truncateSeconds(mAlarmExpireTime);
-		alarmMgr.set(AlarmManager.RTC_WAKEUP, mAlarmExpireTime, alarmIntent);
+		setAlarmExpireTime(truncateSeconds(getAlarmExpireTime()));
+		alarmMgr.set(AlarmManager.RTC_WAKEUP, getAlarmExpireTime(), alarmIntent);
 
-		final String dateStringLog = DateFormat.getTimeInstance(DateFormat.LONG).format(mAlarmExpireTime);
+		final String dateStringLog = DateFormat.getTimeInstance(DateFormat.LONG).format(getAlarmExpireTime());
 		Log.i(TAG, "onReceive Set expireTime=" + dateStringLog);
 
 		// ----------------------------------------------------
@@ -230,7 +267,7 @@ public class WidgetService extends Service {
 		// Create toast to alert user
 		String toastText = context.getString(R.string.toast_ON);
 		final String dateStringUser = DateFormat.getTimeInstance(DateFormat.SHORT).format(
-				mAlarmExpireTime);
+				getAlarmExpireTime());
 		toastText = String.format(toastText, dateStringUser);
 
 		if (mToast != null) {
@@ -275,7 +312,10 @@ public class WidgetService extends Service {
 
 	}
 
-	
+	/**
+	 * @param context
+	 * @return PendingIntent for AlarmManager
+	 */
 	private PendingIntent createAlarmIntent(Context context) {
 		Intent intentAlarmReceiver = new Intent(context, WidgetProvider.class);
 		intentAlarmReceiver.setAction(INTENT_ACTION_TIMER_EXPIRED);
@@ -283,9 +323,10 @@ public class WidgetService extends Service {
 		return PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
 	}
 
-	// ********************************
-	// Sets seconds portion of input time to 0
-	// e.g. 12:30:17 -> 12:30:00
+	/**
+	 * @param timeInMilliseconds
+	 * @return equivalent time in Milliseconds rounded down to nearest minute
+	 */
 	public static long truncateSeconds(long timeInMilliseconds) {
 		long returnValue = 0;
 
@@ -297,9 +338,11 @@ public class WidgetService extends Service {
 		return returnValue;
 	}
 
-	// ********************************
-	// convert integer of RingMode into a string
-	//
+	/**
+	 * @param curAudioMode from AudioManager.RINGER_MODE_XXXX
+	 * @return String version of curAudioMode 
+	 * 			if the ringer mode is unknown, include int value for reference debugging
+	 */
 	public static String RingerMode_intToString(int curAudioMode) {
 
 		String returnString = "UNKNOWN_MODE";
@@ -322,6 +365,32 @@ public class WidgetService extends Service {
 			break;
 		}
 		return returnString;
+	}
+
+	private int getOriginalRingerMode() {
+		return mOriginalRingerMode;
+	}
+
+	private void setOriginalRingerMode(int mOriginalRingerMode) {
+		this.mOriginalRingerMode = mOriginalRingerMode;
+		this.setPrefsUpdated(true);
+	}
+
+	private long getAlarmExpireTime() {
+		return mAlarmExpireTime;
+	}
+
+	private void setAlarmExpireTime(long mAlarmExpireTime) {
+		this.mAlarmExpireTime = mAlarmExpireTime;
+		this.setPrefsUpdated(true);
+	}
+
+	private boolean isPrefsUpdated() {
+		return mPrefsUpdated;
+	}
+
+	private void setPrefsUpdated(boolean mPrefsUpdated) {
+		this.mPrefsUpdated = mPrefsUpdated;
 	}
 
 }
