@@ -45,7 +45,7 @@
         </service>
 
         <receiver
-            android:name="ca.nmsasaki.silenttouch.MyWidgetProvider"
+            android:name="ca.nmsasaki.silenttouch.WidgetProvider"
             android:icon="@drawable/ic_launchf"
             android:label="@string/app_display_name" >
             <intent-filter>
