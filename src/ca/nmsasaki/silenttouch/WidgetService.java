@@ -54,7 +54,7 @@ public class WidgetService extends Service {
 		
 		SharedPreferences prefs = readPrefs(context);
 
-		if (curIntentAction.equals(WidgetProvider.INTENT_ACTION_WIDGET_CLICK) || curIntentAction.equals(INTENT_USER_CLICK)) {
+		if (curIntentAction.equals(INTENT_USER_CLICK)) {
 			UserClickedWidget(context);
 		} else if (curIntentAction.equals(INTENT_ACTION_TIMER_EXPIRED)) {
 			TimerExpired(context);
