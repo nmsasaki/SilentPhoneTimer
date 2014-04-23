@@ -3,6 +3,7 @@ package ca.nmsasaki.silenttouch;
 import java.text.DateFormat;
 import java.util.Calendar;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,10 +14,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+//TODO: SuppressLint investigate this
+@SuppressLint("NewApi")
 public class WidgetService extends Service {
 
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
@@ -34,11 +40,13 @@ public class WidgetService extends Service {
 	private static final String INTENT_ACTION_NOTIFICATION_CANCEL_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_NOTIFICATION_CANCEL_CLICK";
 	private static final String INTENT_ACTION_TIMER_EXPIRED = "ca.nmsasaki.silenttouch.INTENT_ACTION_TIMER_EXPIRED";
 
-	// TODO: remove static mToast
+	// TODO: FUTURE - remove static mToast
 	// mToast is used to cancel an existing toast if user clicks on widget in succession
 	// seems to work find and should be ok if this state gets cleaned up by android
 	private static Toast mToast = null;
-
+	
+	// TODO: STATIC Variable
+	public static RingerModeListener mRingerModeListener= null;
 	
 	private int mOriginalRingerMode = AudioManager.RINGER_MODE_NORMAL;
 	private long mAlarmExpireTime = 0;
@@ -126,6 +134,15 @@ public class WidgetService extends Service {
 		final String curModeString = RingerMode_intToString(curAudioMode);
 		Log.i(TAG, "AudioMode=" + curModeString);
 
+		// ----------------------------------------------------
+		// TODO: Stop Content Observer
+		// ----------------------------------------------------
+		if (mRingerModeListener != null) {
+			getContentResolver().unregisterContentObserver(mRingerModeListener);
+			mRingerModeListener = null;			
+			Log.i(TAG, "RingerModeListener - Cancelled");
+		}
+		
 		if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
 			audioMgr.setRingerMode(getOriginalRingerMode());
 			Log.i(TAG, String.format("AudioMode=%d", getOriginalRingerMode()));
@@ -170,6 +187,15 @@ public class WidgetService extends Service {
 
 		Log.i(TAG, "AudioMode=" + curModeString);
 
+		// ----------------------------------------------------
+		// TODO: Stop Content Observer
+		if (mRingerModeListener != null) {
+			getContentResolver().unregisterContentObserver(mRingerModeListener);
+			mRingerModeListener = null;			
+			Log.i(TAG, "RingerModeListener - Cancelled");
+		}
+		// ----------------------------------------------------
+		
 		if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
 			Log.i(TAG, String.format("before AudioMode=%d", getOriginalRingerMode()));
 			audioMgr.setRingerMode(getOriginalRingerMode());
@@ -292,7 +318,7 @@ public class WidgetService extends Service {
 		notiIntent.setAction(INTENT_ACTION_NOTIFICATION_CANCEL_CLICK);
 		PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, notiIntent, 0);
 
-		// TODO: find actual vibrate icon - cannot find official vibrate icon
+		// TODO: FUTURE - find actual vibrate icon - cannot find official vibrate icon
 		// use regular notification icon
 		int iconId = android.R.drawable.ic_lock_silent_mode_off;
 		// if (mRingerMode == AudioManager.RINGER_MODE_VIBRATE) {
@@ -308,6 +334,16 @@ public class WidgetService extends Service {
 		NotificationManager notMgr = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		notMgr.notify(MY_NOTIFICATION_ID, notiBuilder.build());
+		
+		// ----------------------------------------------------
+		// TODO: Start Content Observer if one does not exist
+		if (mRingerModeListener== null) {
+			Log.i(TAG, "RingerModeListener - Registered");
+			mRingerModeListener = new RingerModeListener(new Handler());
+			Uri ringerModeUri = Settings.Global.getUriFor(Settings.Global.MODE_RINGER);
+			getContentResolver().registerContentObserver(ringerModeUri, false, mRingerModeListener);
+		}
+		// ----------------------------------------------------
 
 		Log.i(TAG, "INTENT_ACTION_WIDGET_CLICK - exit");
 
