@@ -1,6 +1,8 @@
 package ca.nmsasaki.silenttouch;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 //import android.view.View;
@@ -24,7 +26,16 @@ public class FullscreenActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.d(TAG, "FullscreenActivity::onCreate - enter");
+		Log.i(TAG, "FullscreenActivity::onCreate");
+		// register listener
+		Log.i(TAG, "FullscreenActivity::registerListener");
+		Context context = getApplicationContext();
+		Intent serviceIntent = new Intent(context, WidgetService.class);
+		serviceIntent.setAction(WidgetService.INTENT_USER_CLICK);
+		context.startService(serviceIntent);
+		
+		Log.i(TAG, "FullscreenActivity::killActivity");
+		finish();
 
 //		setContentView(R.layout.activity_fullscreen);
 //

@@ -15,17 +15,14 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="ca.nmsasaki.silenttouch.FullscreenActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_display_name"
-            android:theme="@style/FullscreenTheme" >
+            android:theme="@android:style/Theme.NoDisplay" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-<!--                 <category android:name="android.intent.category.LAUNCHER" /> -->
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         
 <!--         <activity -->
 <!--             android:name="ca.nmsasaki.silenttouch.ShortcutActivity" -->
@@ -45,16 +42,14 @@
         </service>
 
         <receiver
-            android:name="ca.nmsasaki.silenttouch.WidgetProvider"
+            android:name="ca.nmsasaki.silenttouch.ShortcutReceiver"
             android:icon="@drawable/ic_launchf"
-            android:label="@string/app_display_name" >
+            android:label="@string/app_display_name" 
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="ca.nmsasaki.silenttouch.WidgetService.INTENT_USER_CLICK" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_provider_metadata" />
         </receiver>
     </application>
 

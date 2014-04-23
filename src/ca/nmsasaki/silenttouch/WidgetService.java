@@ -30,6 +30,7 @@ public class WidgetService extends Service {
 	private static final String PREF_NAME = "ca.nmsasaki.silenttouch.prefs";
 	private static final String PREF_NAME_ALARM_EXPIRE = "ca.nmsasaki.silenttouch.prefs.alarm_expire";
 	private static final String PREF_NAME_ORIGINAL_RINGER_MODE = "ca.nmsasaki.silenttouch.prefs.orig_ringer_mode";
+	public static final String INTENT_USER_CLICK = "ca.nmsasaki.silenttouch.INTENT_USER_CLICK";
 	private static final String INTENT_ACTION_NOTIFICATION_CANCEL_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_NOTIFICATION_CANCEL_CLICK";
 	private static final String INTENT_ACTION_TIMER_EXPIRED = "ca.nmsasaki.silenttouch.INTENT_ACTION_TIMER_EXPIRED";
 
@@ -53,11 +54,11 @@ public class WidgetService extends Service {
 		
 		SharedPreferences prefs = readPrefs(context);
 
-		if (curIntentAction == WidgetProvider.INTENT_ACTION_WIDGET_CLICK) {
+		if (curIntentAction.equals(WidgetProvider.INTENT_ACTION_WIDGET_CLICK) || curIntentAction.equals(INTENT_USER_CLICK)) {
 			UserClickedWidget(context);
-		} else if (curIntentAction == INTENT_ACTION_TIMER_EXPIRED) {
+		} else if (curIntentAction.equals(INTENT_ACTION_TIMER_EXPIRED)) {
 			TimerExpired(context);
-		} else if (intent.getAction() == INTENT_ACTION_NOTIFICATION_CANCEL_CLICK) {
+		} else if (curIntentAction.equals(INTENT_ACTION_NOTIFICATION_CANCEL_CLICK)) {
 			UserClickedCancel(context);
 		}
 		
@@ -287,7 +288,7 @@ public class WidgetService extends Service {
 		notiContentText = String.format(notiContentText, dateStringUser);
 
 		// Pending intent to be fired when notification is clicked
-		Intent notiIntent = new Intent(context, WidgetProvider.class);
+		Intent notiIntent = new Intent(context, ShortcutReceiver.class);
 		notiIntent.setAction(INTENT_ACTION_NOTIFICATION_CANCEL_CLICK);
 		PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, notiIntent, 0);
 
@@ -317,7 +318,7 @@ public class WidgetService extends Service {
 	 * @return PendingIntent for AlarmManager
 	 */
 	private PendingIntent createAlarmIntent(Context context) {
-		Intent intentAlarmReceiver = new Intent(context, WidgetProvider.class);
+		Intent intentAlarmReceiver = new Intent(context, ShortcutReceiver.class);
 		intentAlarmReceiver.setAction(INTENT_ACTION_TIMER_EXPIRED);
 
 		return PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
