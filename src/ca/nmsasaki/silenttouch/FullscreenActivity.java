@@ -27,14 +27,14 @@ public class FullscreenActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		Log.i(TAG, "FullscreenActivity::onCreate");
-		// register listener
-		Log.i(TAG, "FullscreenActivity::registerListener");
+
+		Log.d(TAG, "StartService with INTENT_USER_CLICK");
 		Context context = getApplicationContext();
 		Intent serviceIntent = new Intent(context, WidgetService.class);
 		serviceIntent.setAction(WidgetService.INTENT_USER_CLICK);
 		context.startService(serviceIntent);
 		
-		Log.i(TAG, "FullscreenActivity::killActivity");
+		Log.d(TAG, "FullscreenActivity::killActivity");
 		finish();
 
 //		setContentView(R.layout.activity_fullscreen);

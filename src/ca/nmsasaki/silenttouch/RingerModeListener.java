@@ -1,59 +1,50 @@
 /**
- * 
+ *  To use this class, you must implement the RingerModeListenerHandler interface
+ *  to perform the call back action
+ *  
  */
 package ca.nmsasaki.silenttouch;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 
-/**
- * @author Neil Dev
- *
- */
-//TODO: SuppressLint investigate this
-
+/* 
+ * @SupressLint("NewApi") forces android to use the newer onChange method rather than
+ * the older one. This means this code will NOT work on older devices
+*/
 @SuppressLint("NewApi")
 public class RingerModeListener extends ContentObserver {
 	
 	private static final String TAG = "SilentTouch";
 
-	public RingerModeListener(Handler handler) {
+	public interface RingerModeListenerHandler {
+		public void onChange(boolean SelfChange, Uri uri);
+	}
+	
+	private RingerModeListenerHandler mRingerModeListenerHandler = null;
+
+	public RingerModeListener(Handler handler, RingerModeListenerHandler ringerModeListenerHandler ) {
 		super(handler);
+		
+		Log.d(TAG, "RingerModeListener::Constructor");
+		mRingerModeListenerHandler = ringerModeListenerHandler;
 	}
 
+	/* older method deprecated and not used because of @SuppressLint above */
 	@Override
 	public void onChange(boolean SelfChange) {
 		this.onChange(SelfChange, null);
+		Log.w(TAG, String.format("RingerModeListener::onChange(selfChange), %b", SelfChange));
 	}
 	
 	@Override
 	public void onChange(boolean SelfChange, Uri uri) {
-		//TODO: Handle Settings Change
 		
-		Log.i(TAG, "RingerModeListener::onReceive - enter");
-
-		if (SelfChange) {
-			Log.i(TAG, "Ignore Self Change");
-		} else {
-			Log.i(TAG, "Cancel Timer");
-		}
-		// ----------------------------------------------------
-		// Update the widgets via the service
-		// ----------------------------------------------------
-//		Log.i(TAG, "RingerModeListener::Start Service");
-//		Context context = getApplicationContext();
-//		Intent serviceIntent = new Intent(context, WidgetService.class);
-//		serviceIntent.setAction(intent.getAction());
-//		context.startService(serviceIntent);
-		// ----------------------------------------------------
-
-		
-		Log.i(TAG, "RingerModeListener::onReceive - exit");
+		Log.d(TAG, "RingerModeListener::onChange(selfChange, URI)");
+		mRingerModeListenerHandler.onChange(SelfChange, uri);
 		
 	}
 	
