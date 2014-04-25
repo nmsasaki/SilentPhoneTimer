@@ -28,8 +28,8 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	private static final Uri URI_SETTINGS_GLOBAL_RINGERMODE = Settings.Global.getUriFor(Settings.Global.MODE_RINGER);
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
 	// timer expires on minute change
-	// public static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
-    public static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
+	public static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
+    // public static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
     private static final String TAG = "Silent30";
 	private static final int MY_NOTIFICATION_ID = 1;
 
@@ -147,12 +147,19 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		// -------------------------------------------
 		// clear notification
-		NotificationManager notiMgr = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		notiMgr.cancel(MY_NOTIFICATION_ID);
+		notificationCancel(context);
 
 		Log.d(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - exit");
 
+	}
+
+	/**
+	 * @param context
+	 */
+	private void notificationCancel(Context context) {
+		NotificationManager notiMgr = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		notiMgr.cancel(MY_NOTIFICATION_ID);
 	}
 
 	/**
@@ -167,7 +174,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		// ensure URI is the expected global setting
 		if (!uri.equals(URI_SETTINGS_GLOBAL_RINGERMODE)) {
-			Log.e(TAG, String.format("Unexpected Settings.Global URI=%s", uri.toString()));
+			Log.w(TAG, String.format("Unexpected Settings.Global URI=%s", uri.toString()));
 		}
 
 		Context context = getApplicationContext();
@@ -181,18 +188,31 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		if (curAudioMode != AudioManager.RINGER_MODE_SILENT) {
 			Log.i(TAG, "USER CHANGED RINGER MODE");
+			
+			// need to store state
+			SharedPreferences prefs = readPrefs(context);
 			// -------------------------------------------
 			// cancel timer
 			alarmCancel(context);
 
 			// -------------------------------------------
 			// Build notification to say timer expired
-			final int NotiContentID = R.string.notification_OFF_user_change_ringer;
-			notificationUserCancel(context, NotiContentID);
-			
+//			final int NotiContentID = R.string.notification_OFF_user_change_ringer;
+//			notificationUserCancel(context, NotiContentID);
+
+			// -------------------------------------------
+			// Cancel notification
+			notificationCancel(context);
+
+			// Show toast to user
+			final String toastText = (String) context.getString(R.string.toast_OFF_user_change_ringer);
+			showToast(context, toastText);
+
 			// ----------------------------------------------------
 			// Stop Content Observer
 			ringerModeObserverStop();
+			
+			writePrefs(prefs);
 		}
 
 		Log.d(TAG, "RingerModeListener::onChange - exit");
@@ -350,11 +370,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 				getAlarmExpireTime());
 		toastText = String.format(toastText, dateStringUser);
 
-		if (mToast != null) {
-			mToast.cancel();
-		}
-		mToast = Toast.makeText(context, toastText, Toast.LENGTH_LONG);
-		mToast.show();
+		showToast(context, toastText);
 
 		// ------------------------------------------------
 		// Build notification
@@ -401,6 +417,18 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		Log.d(TAG, "INTENT_ACTION_WIDGET_CLICK - exit");
 
+	}
+
+	/**
+	 * @param context
+	 * @param toastText
+	 */
+	private void showToast(Context context, String toastText) {
+		if (mToast != null) {
+			mToast.cancel();
+		}
+		mToast = Toast.makeText(context, toastText, Toast.LENGTH_LONG);
+		mToast.show();
 	}
 
 	/**

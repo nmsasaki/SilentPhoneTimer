@@ -10,5 +10,6 @@
     <string name="notification_ON_cancel">Restore notifications now</string>
     <string name="notification_OFF_timer">Notifications restored</string>
     <string name="notification_OFF_user_change_ringer">Notifications restored - manual change</string>
+    <string name="toast_OFF_user_change_ringer">Silent 30 cancelled</string>
     <string name="toast_ON">Silent until %s</string>
 </resources>
