@@ -27,6 +27,9 @@
 
  */
 
+//3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+//       1         2         3         4         5         6         7         8         9        10        11        12
+
 package ca.nmsasaki.android.silent30;
 
 import java.text.DateFormat;
@@ -64,8 +67,8 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
 	// timer expires on minute change
-	public static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
-	// public static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
+	//public static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
+	public static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
 
 	private static final String PREF_NAME = "silent30prefs";
 	private static final String PREF_NAME_ALARM_EXPIRE = "alarm_expire";
@@ -204,7 +207,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		// Perform actions before notifying user
 		// this will expose performance delays and show bugs
 
-		Log.d(TAG, "INTENT_ACTION_WIDGET_CLICK - enter");
+		Log.d(TAG, "ACTION_SHORTCUT_CLICK - enter");
 
 		// ----------------------------------------------------
 		// check current ringermode
@@ -242,8 +245,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		setAlarmExpireTime(truncateSeconds(getAlarmExpireTime()));
 		alarmMgr.set(AlarmManager.RTC_WAKEUP, getAlarmExpireTime(), alarmIntent);
 
-		final String dateStringLog = DateFormat.getTimeInstance(DateFormat.LONG).format(
-				getAlarmExpireTime());
+		final String dateStringLog = DateFormat.getTimeInstance(DateFormat.LONG).format(getAlarmExpireTime());
 		Log.i(TAG, "Alarm expireTime=" + dateStringLog);
 
 		// ----------------------------------------------------
@@ -269,7 +271,6 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		// notification strings
 		final String notiTitle = context.getString(R.string.notification_title);
 		final String notiCancel = context.getString(R.string.notification_ON_cancel);
-
 		String notiContentText = context.getString(R.string.notification_ON_content);
 		notiContentText = String.format(notiContentText, dateStringUser);
 
@@ -288,26 +289,26 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		// Define the Notification's expanded message and Intent:
 		Notification.Builder notiBuilder = new Notification.Builder(context)
-				.setSmallIcon(R.drawable.ic_notify).setContentTitle(notiTitle)
-				.setContentText(notiContentText).addAction(iconId, notiCancel, cancelPendingIntent);
+				.setSmallIcon(R.drawable.ic_notify)
+				.setContentTitle(notiTitle)
+				.setContentText(notiContentText)
+				.addAction(iconId, notiCancel, cancelPendingIntent);
 
 		// Pass the Notification to the NotificationManager:
-		NotificationManager notMgr = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		notMgr.notify(NOTIFICATION_ID, notiBuilder.build());
+		NotificationManager notiMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		notiMgr.notify(NOTIFICATION_ID, notiBuilder.build());
 
 		// ----------------------------------------------------
 		// Start Content Observer if one does not exist
-		// TODO: Refactor to singleton
+		// TODO: CLEANUP - change to singleton?
 		if (mRingerModeListener == null) {
 			mRingerModeListener = new RingerModeListener(new Handler(), this);
-			getContentResolver().registerContentObserver(URI_SETTINGS_GLOBAL_RINGERMODE, false,
-					mRingerModeListener);
+			getContentResolver().registerContentObserver(URI_SETTINGS_GLOBAL_RINGERMODE, false, mRingerModeListener);
 			Log.i(TAG, "RingerModeListener::Registered");
 		}
 		// ----------------------------------------------------
 
-		Log.d(TAG, "INTENT_ACTION_WIDGET_CLICK - exit");
+		Log.d(TAG, "ACTION_SHORTCUT_CLICK - exit");
 
 	}
 
@@ -324,7 +325,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * @param context
 	 */
 	private void actionNotificationCancelClick(Context context) {
-		Log.d(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - enter");
+		Log.d(TAG, "ACTION_NOTIFICATION_CANCEL_CLICK - enter");
 
 		// User canceled the mode manually from notifications
 
@@ -349,7 +350,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		// clear notification
 		notificationCancel(context);
 
-		Log.d(TAG, "INTENT_ACTION_NOTIFICATION_CANCEL_CLICK - exit");
+		Log.d(TAG, "ACTION_NOTIFICATION_CANCEL_CLICK - exit");
 
 	}
 	
@@ -364,7 +365,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * @param context
 	 */
 	private void actionRingerModeChange(Context context) {
-		Log.i(TAG, "USER CHANGED RINGER MODE");
+		Log.d(TAG, "ACTION_RINGERMODE_CHANGE - enter");
 
 		// -------------------------------------------
 		// cancel timer 
@@ -388,6 +389,8 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		// Stop Content Observer
 		ringerModeObserverStop();
 		
+		Log.d(TAG, "ACTION_RINGERMODE_CHANGE - exit");
+		
 	}
 
 	
@@ -402,7 +405,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 */
 	private void actionTimerExpire(Context context) {
 
-		Log.d(TAG, "INTENT_ACTION_TIMER_EXPIRED - enter");
+		Log.d(TAG, "ACTION_TIMER_EXPIRE - enter");
 
 		// Timer expired - restore previous notification type
 
@@ -430,7 +433,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		// set AlarmExpire to 0 to show that there is no more timer
 		setAlarmExpireTime(0);
 
-		Log.d(TAG, "INTENT_ACTION_TIMER_EXPIRED - exit");
+		Log.d(TAG, "ACTION_TIMER_EXPIRE - exit");
 
 	}
 
@@ -452,8 +455,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 				.setContentText(contentText);
 
 		// Pass the Notification to the NotificationManager:
-		NotificationManager notiMgr = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager notiMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notiMgr.notify(NOTIFICATION_ID, notiBuilder.build());
 	}
 
@@ -463,8 +465,8 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * @param context
 	 */
 	private void notificationCancel(Context context) {
-		NotificationManager notiMgr = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
+		
+		NotificationManager notiMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notiMgr.cancel(NOTIFICATION_ID);
 	}
 	
@@ -487,8 +489,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * @param context
 	 * @return PendingIntent for AlarmManager
 	 */
-	private PendingIntent alarmIntentCreate
-	(Context context) {
+	private PendingIntent alarmIntentCreate (Context context) {
 		Intent intentAlarmReceiver = new Intent(context, ShortcutReceiver.class);
 		intentAlarmReceiver.setAction(ACTION_TIMER_EXPIRE);
 
@@ -514,6 +515,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * Unregister listener on user RingerMode changes
 	 */
 	private void ringerModeObserverStop() {
+		
 		if (mRingerModeListener != null) {
 			getContentResolver().unregisterContentObserver(mRingerModeListener);
 			mRingerModeListener = null;
@@ -574,7 +576,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 	
 	// ---------------------------------------------------------------
-	// Getters and setters
+	// Preferences stuff
 	// TODO: CLEANUP - move preferences into separate class?
 	// ---------------------------------------------------------------
 	
@@ -584,6 +586,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * if preferences were updated, then write to storage
 	 */
 	private void prefsWrite(SharedPreferences prefs) {
+		
 		if (isPrefsUpdated()) {
 			Editor editor = prefs.edit();
 			editor.putInt(PREF_NAME_ORIGINAL_RINGER_MODE, getOriginalRingerMode());
@@ -597,9 +600,9 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * @return SharedPreferences populated with app state
 	 */
 	private SharedPreferences prefsRead(final Context context) {
+		
 		SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-		setOriginalRingerMode(prefs.getInt(PREF_NAME_ORIGINAL_RINGER_MODE,
-				AudioManager.RINGER_MODE_NORMAL));
+		setOriginalRingerMode(prefs.getInt(PREF_NAME_ORIGINAL_RINGER_MODE, AudioManager.RINGER_MODE_NORMAL));
 		setAlarmExpireTime(prefs.getLong(PREF_NAME_ALARM_EXPIRE, 0));
 		return prefs;
 	}
