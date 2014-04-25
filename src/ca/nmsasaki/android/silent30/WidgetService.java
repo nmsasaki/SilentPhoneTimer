@@ -33,14 +33,12 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
     private static final String TAG = "Silent30";
 	private static final int MY_NOTIFICATION_ID = 1;
 
-	// private static final String INTENT_ACTION_WIDGET_CLICK =
-	// "ca.nmsasaki.silenttouch.INTENT_ACTION_WIDGET_CLICK";
-	private static final String PREF_NAME = "ca.nmsasaki.silenttouch.prefs";
-	private static final String PREF_NAME_ALARM_EXPIRE = "ca.nmsasaki.silenttouch.prefs.alarm_expire";
-	private static final String PREF_NAME_ORIGINAL_RINGER_MODE = "ca.nmsasaki.silenttouch.prefs.orig_ringer_mode";
-	public static final String INTENT_USER_CLICK = "ca.nmsasaki.silenttouch.INTENT_USER_CLICK";
-	private static final String INTENT_ACTION_NOTIFICATION_CANCEL_CLICK = "ca.nmsasaki.silenttouch.INTENT_ACTION_NOTIFICATION_CANCEL_CLICK";
-	private static final String INTENT_ACTION_TIMER_EXPIRED = "ca.nmsasaki.silenttouch.INTENT_ACTION_TIMER_EXPIRED";
+	private static final String PREF_NAME = "silent30prefs";
+	private static final String PREF_NAME_ALARM_EXPIRE = "prefs.alarm_expire";
+	private static final String PREF_NAME_ORIGINAL_RINGER_MODE = "prefs.orig_ringer_mode";
+	public static final String ACTION_SHORTCUT_CLICK = "ACTION_SHORTCUT_CLICK";
+	private static final String ACTION_NOTIFICATION_CANCEL_CLICK = "ACTION_NOTIFICATION_CANCEL_CLICK";
+	private static final String ACTION_TIMER_EXPIRED = "ACTION_TIMER_EXPIRED";
 
 	// TODO: FUTURE - remove static mToast
 	// mToast is used to cancel an existing toast if user clicks on widget in
@@ -66,11 +64,11 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		SharedPreferences prefs = readPrefs(context);
 
-		if (curIntentAction.equals(INTENT_USER_CLICK)) {
+		if (curIntentAction.equals(ACTION_SHORTCUT_CLICK)) {
 			UserClickedWidget(context);
-		} else if (curIntentAction.equals(INTENT_ACTION_TIMER_EXPIRED)) {
+		} else if (curIntentAction.equals(ACTION_TIMER_EXPIRED)) {
 			TimerExpired(context);
-		} else if (curIntentAction.equals(INTENT_ACTION_NOTIFICATION_CANCEL_CLICK)) {
+		} else if (curIntentAction.equals(ACTION_NOTIFICATION_CANCEL_CLICK)) {
 			UserClickedCancel(context);
 		}
 
@@ -370,7 +368,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		// Pending intent to be fired when notification is clicked
 		Intent notiIntent = new Intent(context, ShortcutReceiver.class);
-		notiIntent.setAction(INTENT_ACTION_NOTIFICATION_CANCEL_CLICK);
+		notiIntent.setAction(ACTION_NOTIFICATION_CANCEL_CLICK);
 		PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(context, 0, notiIntent, 0);
 
 		// TODO: FUTURE - find actual vibrate icon - cannot find official
@@ -411,7 +409,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 */
 	private PendingIntent createAlarmIntent(Context context) {
 		Intent intentAlarmReceiver = new Intent(context, ShortcutReceiver.class);
-		intentAlarmReceiver.setAction(INTENT_ACTION_TIMER_EXPIRED);
+		intentAlarmReceiver.setAction(ACTION_TIMER_EXPIRED);
 
 		return PendingIntent.getBroadcast(context, 0, intentAlarmReceiver, 0);
 	}

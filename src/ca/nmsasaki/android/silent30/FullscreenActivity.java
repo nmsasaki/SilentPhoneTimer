@@ -28,10 +28,10 @@ public class FullscreenActivity extends Activity {
 
 		Log.i(TAG, "FullscreenActivity::onCreate");
 
-		Log.d(TAG, "StartService with INTENT_USER_CLICK");
+		Log.d(TAG, "StartService with ACTION_SHORTCUT_CLICK");
 		Context context = getApplicationContext();
 		Intent serviceIntent = new Intent(context, WidgetService.class);
-		serviceIntent.setAction(WidgetService.INTENT_USER_CLICK);
+		serviceIntent.setAction(WidgetService.ACTION_SHORTCUT_CLICK);
 		context.startService(serviceIntent);
 		
 		Log.d(TAG, "FullscreenActivity::killActivity");
