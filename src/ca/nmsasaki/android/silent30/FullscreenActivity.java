@@ -1,4 +1,4 @@
-package ca.nmsasaki.silenttouch;
+package ca.nmsasaki.android.silent30;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,7 +17,7 @@ import android.util.Log;
 
 public class FullscreenActivity extends Activity {
 
-	private static final String TAG = "SilentTouch";
+	private static final String TAG = "Silent30";
 //	private static final int MY_NOTIFICATION_ID = 1;
 
 //	private Button mTestButton = null;

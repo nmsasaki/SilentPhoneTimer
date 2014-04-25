@@ -1,4 +1,4 @@
-package ca.nmsasaki.silenttouch;
+package ca.nmsasaki.android.silent30;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class ShortcutActivity extends Activity {
 
-	private static final String TAG = "SilentTouch";
+	private static final String TAG = "Silent30";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -1,4 +1,4 @@
-package ca.nmsasaki.silenttouch;
+package ca.nmsasaki.android.silent30;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -30,7 +30,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	// timer expires on minute change
 	// public static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
     public static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
-	private static final String TAG = "SilentTouch";
+    private static final String TAG = "Silent30";
 	private static final int MY_NOTIFICATION_ID = 1;
 
 	// private static final String INTENT_ACTION_WIDGET_CLICK =

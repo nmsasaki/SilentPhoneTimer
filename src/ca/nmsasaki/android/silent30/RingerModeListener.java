@@ -3,7 +3,7 @@
  *  to perform the call back action
  *  
  */
-package ca.nmsasaki.silenttouch;
+package ca.nmsasaki.android.silent30;
 
 import android.annotation.SuppressLint;
 import android.database.ContentObserver;
@@ -18,7 +18,7 @@ import android.util.Log;
 @SuppressLint("NewApi")
 public class RingerModeListener extends ContentObserver {
 	
-	private static final String TAG = "SilentTouch";
+	private static final String TAG = "Silent30";
 
 	public interface RingerModeListenerHandler {
 		public void onChange(boolean SelfChange, Uri uri);
