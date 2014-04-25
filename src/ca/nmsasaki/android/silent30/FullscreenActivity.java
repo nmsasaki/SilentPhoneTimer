@@ -1,3 +1,28 @@
+/**    Copyright 2014 Neil Sasaki
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   
+   Class: FullScreenActivity
+   Description: Entry point to trigger functionality.
+    Starts service then exits. There is no actual UI.
+    
+    A launch-able activity was better than a widget because:
+    1. I could put it in the application doc. 
+    2. Widget has no state to show
+    3. I can add the shortcut to the home screen on install 
+ */
+
+
 package ca.nmsasaki.android.silent30;
 
 import android.app.Activity;
@@ -18,7 +43,7 @@ import android.util.Log;
 public class FullscreenActivity extends Activity {
 
 	private static final String TAG = "Silent30";
-//	private static final int MY_NOTIFICATION_ID = 1;
+//	private static final int NOTIFICATION_ID = 1;
 
 //	private Button mTestButton = null;
 	
@@ -69,7 +94,7 @@ public class FullscreenActivity extends Activity {
 //
 //				// Pass the Notification to the NotificationManager:
 //				NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//				mNotificationManager.notify(MY_NOTIFICATION_ID,
+//				mNotificationManager.notify(NOTIFICATION_ID,
 //						notificationBuilder.build());
 //			}
 //		});
