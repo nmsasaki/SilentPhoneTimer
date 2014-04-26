@@ -26,7 +26,6 @@
 package ca.nmsasaki.android.mute30;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,10 +53,9 @@ public class FullscreenActivity extends Activity {
 		Log.i(TAG, "FullscreenActivity::onCreate");
 
 		Log.d(TAG, "StartService with ACTION_SHORTCUT_CLICK");
-		Context context = getApplicationContext();
-		Intent serviceIntent = new Intent(context, WidgetService.class);
+		Intent serviceIntent = new Intent(this, WidgetService.class);
 		serviceIntent.setAction(WidgetService.ACTION_SHORTCUT_CLICK);
-		context.startService(serviceIntent);
+		startService(serviceIntent);
 		
 		Log.d(TAG, "FullscreenActivity::killActivity");
 		finish();
@@ -79,14 +77,13 @@ public class FullscreenActivity extends Activity {
 //				Log.i(TAG, "FullscreenActivity::onButtonClick");
 //
 //				// Pending intent to be fired when notification is clicked
-//				Intent intent = new Intent(v.getContext(), FullscreenActivity.class);
-//				PendingIntent cancelPendingIntent = PendingIntent.getActivity(v.getContext(), 01,
+//				Intent intent = new Intent(this, FullscreenActivity.class);
+//				PendingIntent cancelPendingIntent = PendingIntent.getActivity(this, 01,
 //						intent, Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //
 //				
 //				// Define the Notification's expanded message and Intent:
-//				Notification.Builder notificationBuilder = new Notification.Builder(
-//						getApplicationContext())
+//				Notification.Builder notificationBuilder = new Notification.Builder(this)
 //						.setSmallIcon(android.R.drawable.ic_lock_silent_mode)
 //						.setContentTitle(notiTitle)
 //						.setContentText(notiContentText)
