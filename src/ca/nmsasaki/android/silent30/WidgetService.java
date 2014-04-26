@@ -74,10 +74,11 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	private static final String PREF_NAME_ALARM_EXPIRE = "alarm_expire";
 	private static final String PREF_NAME_ORIGINAL_RINGER_MODE = "orig_ringer_mode";
 
-	public static final String ACTION_SHORTCUT_CLICK = "ACTION_SHORTCUT_CLICK";
-	private static final String ACTION_NOTIFICATION_CANCEL_CLICK = "ACTION_NOTIFICATION_CANCEL_CLICK";
-	private static final String ACTION_TIMER_EXPIRE = "ACTION_TIMER_EXPIRE";
-	private static final String ACTION_RINGERMODE_CHANGE = "ACTION_RINGERMODE_CHANGE";
+	private static final String PACKAGE_NAME = "ca.nmsasaki.android.silent30";
+	public static final String ACTION_SHORTCUT_CLICK = PACKAGE_NAME + "ACTION_SHORTCUT_CLICK";
+	private static final String ACTION_NOTIFICATION_CANCEL_CLICK = PACKAGE_NAME + "ACTION_NOTIFICATION_CANCEL_CLICK";
+	private static final String ACTION_TIMER_EXPIRE = PACKAGE_NAME + "ACTION_TIMER_EXPIRE";
+	private static final String ACTION_RINGERMODE_CHANGE = PACKAGE_NAME + "ACTION_RINGERMODE_CHANGE";
 
 	// TODO: FUTURE static variables - are these ok?
 	private static Toast mToast = null;
