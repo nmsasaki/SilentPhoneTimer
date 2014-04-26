@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Silent30</string>
-    <string name="app_display_name">Silent 30</string>
-    <string name="test_button">Test Button</string>
-    <string name="test_content">TEST\nCONTENT</string>
-    <string name="notification_title">Silent 30</string>
-    <string name="notification_ON_content">Silent until %s</string>
+    <string name="app_name">Mute30</string>
+    <string name="app_display_name">Mute 30</string>
+    <string name="notification_title">Mute 30</string>
+    <string name="notification_ON_content">Mute until %s</string>
     <string name="notification_ON_cancel">Restore notifications now</string>
     <string name="notification_OFF_timer">Notifications restored</string>
-    <string name="notification_OFF_user_change_ringer">Notifications restored - manual change</string>
-    <string name="toast_OFF_user_change_ringer">Silent 30 cancelled</string>
-    <string name="toast_ON">Silent until %s</string>
+    <string name="toast_OFF_user_change_ringer">Mute 30 disabled</string>
+    <string name="toast_ON">Mute until %s</string>
+    
+<!--     <string name="test_button">Test Button</string> -->
+<!--     <string name="test_content">TEST\nCONTENT</string> -->
+<!--     <string name="notification_OFF_user_change_ringer">Notifications restored - manual change</string> -->
+    
 </resources>

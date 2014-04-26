@@ -51,7 +51,7 @@
    
  */
 
-package ca.nmsasaki.android.silent30;
+package ca.nmsasaki.android.mute30;
 
 import android.annotation.SuppressLint;
 import android.database.ContentObserver;
@@ -68,7 +68,7 @@ import android.util.Log;
 // TODO: CLEANUP - should be more generically named really...
 public class RingerModeListener extends ContentObserver {
 	
-	private static final String TAG = "Silent30";
+	private static final String TAG = "Mute30";
 
 	public interface RingerModeListenerHandler {
 		public void onChange(boolean SelfChange, Uri uri);

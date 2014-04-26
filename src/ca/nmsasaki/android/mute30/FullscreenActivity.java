@@ -23,7 +23,7 @@
  */
 
 
-package ca.nmsasaki.android.silent30;
+package ca.nmsasaki.android.mute30;
 
 import android.app.Activity;
 import android.content.Context;
@@ -42,7 +42,7 @@ import android.util.Log;
 
 public class FullscreenActivity extends Activity {
 
-	private static final String TAG = "Silent30";
+	private static final String TAG = "Mute30";
 //	private static final int NOTIFICATION_ID = 1;
 
 //	private Button mTestButton = null;

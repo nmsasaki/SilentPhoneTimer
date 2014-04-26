@@ -14,23 +14,23 @@
    limitations under the License.
    
    Class: WidgetService
-   Description: This application sets the phone to silent mode for 30 minute intervals.
+   Description: This application sets the phone to mute 30 minute intervals.
      This class does all the main processing for the application.
      On initial action: ACTION_SHORTCUT_CLICK, sets phone to quiet mode for 30 minutes
      Other possible actions: 
      * ACTION_TIMER_EXPIRE
-         * silent mode expires
+         * mute mode expired - need to restore regular notifications
      * ACTION_NOTIFICATION_CANCEL_CLICK
-     *   * user manually cancels silent mode from notification drawer
+     *   * user manually cancels mute mode from notification drawer
      * ACTION_RINGERMODE_CHANGE
-         * user manually changes mode from silent to something else
+         * user manually changes mode from mute to something else (normal or vibrate)
 
  */
 
 //3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 //       1         2         3         4         5         6         7         8         9        10        11        12
 
-package ca.nmsasaki.android.silent30;
+package ca.nmsasaki.android.mute30;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -61,20 +61,20 @@ import android.widget.Toast;
 @SuppressLint("NewApi")
 public class WidgetService extends Service implements RingerModeListener.RingerModeListenerHandler {
 
-	private static final String TAG = "Silent30";
+	private static final String TAG = "Mute30";
 	private static final int NOTIFICATION_ID = 1;
 	private static final Uri URI_SETTINGS_GLOBAL_RINGERMODE = Settings.Global.getUriFor(Settings.Global.MODE_RINGER);
 	
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
 	// timer expires on minute change
-	//public static final long SILENT_DURATION_MILLISECONDS = 2 * 60 * 1000;
-	public static final long SILENT_DURATION_MILLISECONDS = 30 * 60 * 1000;
+	//public static final long MUTE_DURATION_MILLISECONDS = 2 * 60 * 1000;
+	public static final long MUTE_DURATION_MILLISECONDS = 30 * 60 * 1000;
 
-	private static final String PREF_NAME = "silent30prefs";
+	private static final String PREF_NAME = "mute30prefs";
 	private static final String PREF_NAME_ALARM_EXPIRE = "alarm_expire";
 	private static final String PREF_NAME_ORIGINAL_RINGER_MODE = "orig_ringer_mode";
 
-	private static final String PACKAGE_NAME = "ca.nmsasaki.android.silent30";
+	private static final String PACKAGE_NAME = "ca.nmsasaki.android.mute30";
 	public static final String ACTION_SHORTCUT_CLICK = PACKAGE_NAME + "ACTION_SHORTCUT_CLICK";
 	private static final String ACTION_NOTIFICATION_CANCEL_CLICK = PACKAGE_NAME + "ACTION_NOTIFICATION_CANCEL_CLICK";
 	private static final String ACTION_TIMER_EXPIRE = PACKAGE_NAME + "ACTION_TIMER_EXPIRE";
@@ -191,7 +191,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	//------------------------------------------------------
 	/**
 	 * User clicked on the application short cut
-	 * This should put the phone into silent ringer mode for 30 minutes or 
+	 * This should mute the phone (silent ringer mode) for 30 minutes or 
 	 * add 30 more minutes to the existing timer
 	 * 
 	 * Steps:
@@ -224,7 +224,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		if (getAlarmExpireTime() == 0) {
 			// record current state
 			// set time for silence to expire
-			setAlarmExpireTime(System.currentTimeMillis() + SILENT_DURATION_MILLISECONDS);
+			setAlarmExpireTime(System.currentTimeMillis() + MUTE_DURATION_MILLISECONDS);
 
 			// set ringer mode to restore here
 			// if the ringer mode is silent already, then set restore mode to
@@ -239,7 +239,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		} else {
 			// set time for silence to expire based on previous value
-			setAlarmExpireTime(getAlarmExpireTime() + SILENT_DURATION_MILLISECONDS);
+			setAlarmExpireTime(getAlarmExpireTime() + MUTE_DURATION_MILLISECONDS);
 		}
 
 		PendingIntent alarmIntent = alarmIntentCreate(context);
@@ -315,7 +315,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 	
 	/**
-	 * User clicked to cancel silent mode from the Android notification drawer
+	 * User clicked to cancel mute mode from the Android notification drawer
 	 * 
 	 * Work required:
 	 * 1. Stop ringerMode observer 
@@ -396,7 +396,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 	
 	/**
-	 * Silent time has expired. Need to set phone back to original ringer mode
+	 * Mute timer has expired. Need to set phone back to original ringer mode
 	 * Steps:
 	 * 1. Stop RingerMode Observer 
 	 * 2. Restore Ringer Mode 
@@ -443,7 +443,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	// --------------------------------------------------
 
 	/**
-	 * Display a notification explaining why silent mode ended
+	 * Display a notification explaining why mute mode ended
 	 * 
 	 * @param context, contentText
 	 */
@@ -498,7 +498,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	}
 	
 	/**
-	 * Cancel timer that will let us know when silent time should end
+	 * Cancel timer now and set alarmExpireTime = 0 
 	 * 
 	 * @param context
 	 */

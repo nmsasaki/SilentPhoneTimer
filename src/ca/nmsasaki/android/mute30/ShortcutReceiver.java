@@ -23,7 +23,7 @@
       
  */
 
-package ca.nmsasaki.android.silent30;
+package ca.nmsasaki.android.mute30;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,7 +32,7 @@ import android.util.Log;
 
 public class ShortcutReceiver extends BroadcastReceiver {
 
-	private static final String TAG = "Silent30";
+	private static final String TAG = "Mute30";
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
