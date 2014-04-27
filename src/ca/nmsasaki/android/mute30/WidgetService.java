@@ -279,7 +279,6 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		Intent notiIntent = new Intent(this, WidgetService.class);
 //		notiIntent.setAction(ACTION_NOTIFICATION_CANCEL_CLICK);
 		notiIntent.setAction(Intent.ACTION_DELETE);
-		Log.wtf(TAG, notiIntent.getAction());
 		PendingIntent cancelPendingIntent = PendingIntent.getService(this, 0, notiIntent, 0);
 
 		// TODO: FUTURE - find actual vibrate icon - cannot find official
