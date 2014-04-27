@@ -56,6 +56,7 @@ public class FullscreenActivity extends Activity {
 		Intent serviceIntent = new Intent(this, WidgetService.class);
 		serviceIntent.setAction(WidgetService.ACTION_SHORTCUT_CLICK);
 		startService(serviceIntent);
+		//sendBroadcast(serviceIntent);
 		
 		Log.d(TAG, "FullscreenActivity::killActivity");
 		finish();

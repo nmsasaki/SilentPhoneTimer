@@ -65,6 +65,14 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	private static final int NOTIFICATION_ID = 1;
 	private static final Uri URI_SETTINGS_GLOBAL_RINGERMODE = Settings.Global.getUriFor(Settings.Global.MODE_RINGER);
 	
+	private static final String PACKAGE_NAME = "ca.nmsasaki.android.mute30";
+
+	public static final String ACTION_SHORTCUT_CLICK = 				PACKAGE_NAME + ".ACTION_SHORTCUT_CLICK";
+	public static final String ACTION_RINGERMODE_CHANGE = 			PACKAGE_NAME + ".ACTION_RINGERMODE_CHANGE";
+//	public static final String ACTION_NOTIFICATION_CANCEL_CLICK = 	PACKAGE_NAME + ".ACTION_NOTIFICATION_CANCEL_CLICK";
+//	public static final String ACTION_TIMER_EXPIRE = 				PACKAGE_NAME + ".ACTION_TIMER_EXPIRE";
+
+	
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
 	// timer expires on minute change
 //	public static final long MUTE_DURATION_MILLISECONDS = 2 * 60 * 1000;
@@ -73,12 +81,6 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	private static final String PREF_NAME = "mute30prefs";
 	private static final String PREF_NAME_ALARM_EXPIRE = "alarm_expire";
 	private static final String PREF_NAME_ORIGINAL_RINGER_MODE = "orig_ringer_mode";
-
-	private static final String PACKAGE_NAME = "ca.nmsasaki.android.mute30";
-	public static final String ACTION_SHORTCUT_CLICK = 				PACKAGE_NAME + ".ACTION_SHORTCUT_CLICK";
-	private static final String ACTION_NOTIFICATION_CANCEL_CLICK = 	PACKAGE_NAME + ".ACTION_NOTIFICATION_CANCEL_CLICK";
-	private static final String ACTION_TIMER_EXPIRE = 				PACKAGE_NAME + ".ACTION_TIMER_EXPIRE";
-	private static final String ACTION_RINGERMODE_CHANGE = 			PACKAGE_NAME + ".ACTION_RINGERMODE_CHANGE";
 
 	// TODO: FUTURE static variables - are these ok?
 	private static Toast mToast = null;
@@ -119,9 +121,11 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		if (curIntentAction.equals(ACTION_SHORTCUT_CLICK)) {
 			actionShortcutClick();
-		} else if (curIntentAction.equals(ACTION_TIMER_EXPIRE)) {
+//		} else if (curIntentAction.equals(ACTION_TIMER_EXPIRE)) {
+		} else if (curIntentAction.equals(Intent.ACTION_SEND)) {
 			actionTimerExpire();
-		} else if (curIntentAction.equals(ACTION_NOTIFICATION_CANCEL_CLICK)) {
+//		} else if (curIntentAction.equals(ACTION_NOTIFICATION_CANCEL_CLICK)) {
+		} else if (curIntentAction.equals(Intent.ACTION_DELETE)) {
 			actionNotificationCancelClick();
 		} else if (curIntentAction.equals(ACTION_RINGERMODE_CHANGE)) {
 			actionRingerModeChange();
@@ -272,9 +276,11 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		notiContentText = String.format(notiContentText, dateStringUser);
 
 		// Pending intent to be fired when notification is clicked
-		Intent notiIntent = new Intent(this, ShortcutReceiver.class);
-		notiIntent.setAction(ACTION_NOTIFICATION_CANCEL_CLICK);
-		PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(this, 0, notiIntent, 0);
+		Intent notiIntent = new Intent(this, WidgetService.class);
+//		notiIntent.setAction(ACTION_NOTIFICATION_CANCEL_CLICK);
+		notiIntent.setAction(Intent.ACTION_DELETE);
+		Log.wtf(TAG, notiIntent.getAction());
+		PendingIntent cancelPendingIntent = PendingIntent.getService(this, 0, notiIntent, 0);
 
 		// TODO: FUTURE - find actual vibrate icon - cannot find official
 		// vibrate icon
@@ -478,10 +484,11 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 * @return PendingIntent for AlarmManager
 	 */
 	private PendingIntent alarmIntentCreate () {
-		Intent intentAlarmReceiver = new Intent(this, ShortcutReceiver.class);
-		intentAlarmReceiver.setAction(ACTION_TIMER_EXPIRE);
+		Intent intentAlarmReceiver = new Intent(this, WidgetService.class);
+//		intentAlarmReceiver.setAction(ACTION_TIMER_EXPIRE);
+		intentAlarmReceiver.setAction(Intent.ACTION_SEND);
 
-		return PendingIntent.getBroadcast(this, 0, intentAlarmReceiver, 0);
+		return PendingIntent.getService(this, 0, intentAlarmReceiver, 0);
 	}
 	
 	/**
