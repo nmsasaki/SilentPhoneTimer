@@ -75,8 +75,8 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
 	// timer expires on minute change
-	public static final long MUTE_DURATION_MILLISECONDS = 2 * 60 * 1000;
-//	public static final long MUTE_DURATION_MILLISECONDS = 30 * 60 * 1000;
+//	public static final long MUTE_DURATION_MILLISECONDS = 2 * 60 * 1000;
+	public static final long MUTE_DURATION_MILLISECONDS = 30 * 60 * 1000;
 
 	private static final String PREF_NAME = "mute30prefs";
 	private static final String PREF_NAME_ALARM_EXPIRE = "alarm_expire";
