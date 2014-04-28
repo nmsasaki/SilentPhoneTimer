@@ -185,7 +185,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 			handleActions(intent);
 		}
 
-		Log.d(TAG, "RingerModeListener::onChange - exit");
+		Log.d(TAG, "WidgetService::RingerModeListener::onChange - exit");
 	}
 	
 	//------------------------------------------------------
