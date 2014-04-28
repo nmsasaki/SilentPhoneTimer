@@ -95,6 +95,7 @@ public class RingerModeListener extends ContentObserver {
 		
 		Log.d(TAG, "RingerModeListener::onChange(selfChange, URI)");
 		mRingerModeListenerHandler.onChange(SelfChange, uri);
+		Log.d(TAG, "RingerModeListener::onChange(selfChange, URI) - exit");
 		
 	}
 	

@@ -99,7 +99,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "WidgetService::onStart - enter");
 
-		handleCommand(intent);
+		handleActions(intent);
 
 		return START_STICKY;
 	}
@@ -112,7 +112,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 *   
 	 * @param intent
 	 */
-	private void handleCommand(Intent intent) {
+	private void handleActions(Intent intent) {
 
 		final String curIntentAction = intent.getAction();
 		Log.i(TAG, "WidgetService::handleCommand - " + curIntentAction);
@@ -182,7 +182,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		if (curAudioMode != AudioManager.RINGER_MODE_SILENT) {
 			Intent intent = new Intent(this, WidgetService.class);
 			intent.setAction(ACTION_RINGERMODE_CHANGE);
-			handleCommand(intent);
+			handleActions(intent);
 		}
 
 		Log.d(TAG, "RingerModeListener::onChange - exit");
