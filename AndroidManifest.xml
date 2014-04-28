@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ca.nmsasaki.android.mute30"
     android:versionCode="1"
-    android:versionName="1.0.1b" >
+    android:versionName="1.0.1b" xmlns:tools="http://schemas.android.com/tools">
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -24,10 +24,15 @@
             </intent-filter>
         </activity>
         
+<!--         
+	This service is exported for Android NotificationManager and AlarmManager
+	If I specify a permission for it, doesn't that mean those services will NOT be able to use it?
+	Leaving permission unspecified. 
+-->
         <service
             android:name=".WidgetService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true" tools:ignore="ExportedService">
         </service>
     </application>
 

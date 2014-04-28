@@ -69,14 +69,14 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 	public static final String ACTION_SHORTCUT_CLICK = 				PACKAGE_NAME + ".ACTION_SHORTCUT_CLICK";
 	public static final String ACTION_RINGERMODE_CHANGE = 			PACKAGE_NAME + ".ACTION_RINGERMODE_CHANGE";
-//	public static final String ACTION_NOTIFICATION_CANCEL_CLICK = 	PACKAGE_NAME + ".ACTION_NOTIFICATION_CANCEL_CLICK";
-//	public static final String ACTION_TIMER_EXPIRE = 				PACKAGE_NAME + ".ACTION_TIMER_EXPIRE";
+	public static final String ACTION_NOTIFICATION_CANCEL_CLICK = 	PACKAGE_NAME + ".ACTION_NOTIFICATION_CANCEL_CLICK";
+	public static final String ACTION_TIMER_EXPIRE = 				PACKAGE_NAME + ".ACTION_TIMER_EXPIRE";
 
 	
 	// when testing minimum is 2 minutes because I round seconds down to 00 to
 	// timer expires on minute change
-//	public static final long MUTE_DURATION_MILLISECONDS = 2 * 60 * 1000;
-	public static final long MUTE_DURATION_MILLISECONDS = 30 * 60 * 1000;
+	public static final long MUTE_DURATION_MILLISECONDS = 2 * 60 * 1000;
+//	public static final long MUTE_DURATION_MILLISECONDS = 30 * 60 * 1000;
 
 	private static final String PREF_NAME = "mute30prefs";
 	private static final String PREF_NAME_ALARM_EXPIRE = "alarm_expire";
@@ -115,17 +115,15 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	private void handleActions(Intent intent) {
 
 		final String curIntentAction = intent.getAction();
-		Log.i(TAG, "WidgetService::handleCommand - " + curIntentAction);
+		Log.i(TAG, "WidgetService::handleActions - " + curIntentAction);
 
 		SharedPreferences prefs = prefsRead();
 
 		if (curIntentAction.equals(ACTION_SHORTCUT_CLICK)) {
 			actionShortcutClick();
-//		} else if (curIntentAction.equals(ACTION_TIMER_EXPIRE)) {
-		} else if (curIntentAction.equals(Intent.ACTION_SEND)) {
+		} else if (curIntentAction.equals(ACTION_TIMER_EXPIRE)) {
 			actionTimerExpire();
-//		} else if (curIntentAction.equals(ACTION_NOTIFICATION_CANCEL_CLICK)) {
-		} else if (curIntentAction.equals(Intent.ACTION_DELETE)) {
+		} else if (curIntentAction.equals(ACTION_NOTIFICATION_CANCEL_CLICK)) {
 			actionNotificationCancelClick();
 		} else if (curIntentAction.equals(ACTION_RINGERMODE_CHANGE)) {
 			actionRingerModeChange();
@@ -133,7 +131,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		
 		prefsWrite(prefs);
 
-		Log.d(TAG, "WidgetService::handleCommand - exit");
+		Log.d(TAG, "WidgetService::handleActions - exit");
 		stopSelf();
 	}
 
@@ -277,8 +275,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 
 		// Pending intent to be fired when notification is clicked
 		Intent notiIntent = new Intent(this, WidgetService.class);
-//		notiIntent.setAction(ACTION_NOTIFICATION_CANCEL_CLICK);
-		notiIntent.setAction(Intent.ACTION_DELETE);
+		notiIntent.setAction(ACTION_NOTIFICATION_CANCEL_CLICK);
 		PendingIntent cancelPendingIntent = PendingIntent.getService(this, 0, notiIntent, 0);
 
 		// TODO: FUTURE - find actual vibrate icon - cannot find official
@@ -416,9 +413,8 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 		ringerModeObserverStop();
 
 		if (curAudioMode == AudioManager.RINGER_MODE_SILENT) {
-			Log.i(TAG, String.format("before AudioMode=%d", getOriginalRingerMode()));
 			audioMgr.setRingerMode(getOriginalRingerMode());
-			Log.i(TAG, String.format("after AudioMode=%d", getOriginalRingerMode()));
+			Log.i(TAG, String.format("AudioMode=%s", ringerMode_intToString(getOriginalRingerMode())));
 		}
 
 		// -------------------------------------------
@@ -484,8 +480,7 @@ public class WidgetService extends Service implements RingerModeListener.RingerM
 	 */
 	private PendingIntent alarmIntentCreate () {
 		Intent intentAlarmReceiver = new Intent(this, WidgetService.class);
-//		intentAlarmReceiver.setAction(ACTION_TIMER_EXPIRE);
-		intentAlarmReceiver.setAction(Intent.ACTION_SEND);
+		intentAlarmReceiver.setAction(ACTION_TIMER_EXPIRE);
 
 		return PendingIntent.getService(this, 0, intentAlarmReceiver, 0);
 	}
