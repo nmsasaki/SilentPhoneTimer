@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
-    tools:context="ca.nmsasaki.android.mute30.FullscreenActivity" >
+    tools:context="ca.nmsasaki.android.mute30.FullscreenActivity"
+    tools:ignore="UnusedResources" >
 
 <!--     <TextView -->
 <!--         android:id="@+id/fullscreen_content" -->
