@@ -1,3 +1,7 @@
+<!-- I as using this for testing before my service/widget/broadcastreceiver 
+	was working I assume it will be stripped about by proguard for production builds
+ -->
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
